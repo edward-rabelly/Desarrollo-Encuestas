@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es"> <!-- Cambiado a 'es' para indicar que la app está en español -->
+  <head>
+    <meta charset="utf-8" />
+    <title>EdwardProyecto</title>
+    <!-- Base href es OBLIGATORIO para que el Router de Angular funcione correctamente -->
+    <base href="/" />
+
+    <!-- Meta tag esencial para el diseño responsivo en móviles y tablets -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Fuentes de Google (Roboto) necesarias para el diseño de Angular Material -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+
+    <!-- Fuentes de Google (Roboto) necesarias para el diseño de Angular Material -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Librería de iconos de Google (Habilita el uso de <mat-icon> en toda la app) -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- PUNTO DE ANCLAJE (Bootstrap): 
+         Aquí es donde Angular inyecta el AppComponent (y por ende, toda la aplicación) -->
+    <app-root></app-root>
+  </body>
+</html>
+
+<!--Este archivo es la base principal  o contenedor base, por eso tiene link a iconos y las fuentes de diseño de angular
+pero para que no todo lo tenga este archivo usamos los demas archivos que son usuarios,encuesta, menur component-->
+
+<!-- Ademas tengo app-root para que este archivo para que angular lo busque y mire tengan ese app-root o app-->

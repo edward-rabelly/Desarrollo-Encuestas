@@ -1,0 +1,45 @@
+// Importamos el motor de temas de Angular Material como 'mat'
+// Esto nos permite acceder a las paletas de colores y mixins de Material 3
+@use '@angular/material' as mat;
+
+
+// 1. CONFIGURACIÓN GLOBAL DEL TEMA (Material 3 Design System)
+html {
+  height: 100%;
+
+  // Aplicamos el mixin 'theme' que genera todas las variables CSS necesarias
+  @include mat.theme(
+    (
+      color: (
+         // Paleta principal (usada en botones primarios, barras de título, etc.)
+        primary: mat.$cyan-palette,
+        // Paleta terciaria (usada para acentos o estados secundarios)
+        tertiary: mat.$orange-palette,
+      ),
+      typography: Roboto, // Fuente estándar y legible de Material Design
+      density: 0, // Espaciado y tamaños estándar (ni muy compactos, ni muy grandes)
+    )
+  );
+}
+ 
+
+// 2. ESTILOS BASE DEL CUERPO (Body)
+body {
+  // Forzamos el esquema de colores a 'light' (claro). 
+  // Se puede cambiar a 'dark' o 'light dark' para soportar modo oscuro del sistema.
+  color-scheme: light;
+
+  // Usamos las VARIABLES CSS del sistema de Material (la forma más moderna y eficiente)
+  // en lugar de hardcodear colores hexadecimales.
+  background-color: var(--mat-sys-surface); // Color de fondo base
+  color: var(--mat-sys-on-surface); // Color de texto base (contraste automático)
+  font: var(--mat-sys-body-medium); // Tamaño y peso de fuente estándar
+
+  // Reset del margen por defecto del navegador para evitar espacios blancos no deseados
+  margin: 0;
+  height: 100%;
+}
+
+//es un archivo de estructura general de los colores, Para garantizar la consistencia visual y el mantenimiento del proyecto, 
+//utilicé el Sistema de Diseño de Angular Material 3. En lugar de hardcodear colores en cada componente, configuré un tema global en
+// este archivo SCSS utilizando mixins.

@@ -1,0 +1,29 @@
+.sidenav-container {
+  height: 100vh; /* Ocupa el 100% de la altura visible de la pantalla (Viewport Height) */
+  width: 100%; /* Ocupa todo el ancho */
+} 
+/*Esto ocupa todo el espacio de la pantalla y es toda la primera vista de mi app  */
+    
+.sidenav {
+  width: 200px; /* El menú de la izquierda tendrá un ancho fijo de 200 píxeles */
+}
+
+.sidenav .mat-toolbar {
+  background: inherit; /* La barra de título dentro del menú lateral tendrá el mismo color de fondo que su contenedor (se camufla) */
+}
+ /* Estas dos aprtes me dicen como se distribuye el espacio y que vana  estar de igual color*/
+
+
+.mat-toolbar.mat-primary {
+  position: sticky; /* Se comporta como una barra fija */
+  top: 0; /* Se pega justo en la parte superior (0 píxeles desde arriba) */
+  z-index: 1; /* Asegura que esta barra esté "por encima" de todo el contenido si haces scroll */
+}
+
+mat-sidenav-content {
+  padding: 20px; /* Agrega un espacio de 20 píxeles alrededor del contenido */
+}
+
+/*Esta es la otra barra azul pero es de tamaño fijo, lo que esta demas es que cada vez que haya contenido debajo de esta qeu tenga un espácio
+*de unos 20 pixeles
+*/

@@ -1,0 +1,45 @@
+<!-- Contenedor principal de Angular Material que organiza el menú lateral y el área de contenido -->
+<mat-sidenav-container class="sidenav-container">
+    <!-- Menú lateral (Sidenav). 
+       #drawer es una "Variable de Referencia de Plantilla": nos permite controlar este menú 
+       desde otras partes del HTML (como el botón de abrir/cerrar). -->
+  <mat-sidenav
+    #drawer
+    class="sidenav"
+    fixedInViewport
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="(isHandset$ | async) === false"
+  > 
+    <!-- Barra de título interna del menú lateral (camuflada con el CSS que revisamos)-->
+    <mat-toolbar>MENU</mat-toolbar>
+    <!-- Lista de enlaces de navegación. 
+         routerLink permite cambiar de vista sin recargar la página (comportamiento SPA) -->
+    <mat-nav-list> 
+      <a mat-list-item routerLink="/Usuario">Usuario</a> <!-- esto conecta con las carpetas de usuarios -->
+      <a mat-list-item routerLink="/encuesta">Encuesta</a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <!-- Área principal de contenido (el lado derecho de la pantalla) -->
+  <mat-sidenav-content>
+    <!-- Barra superior (Toolbar) con el color de fondo aplicado en línea -->
+    <mat-toolbar style="background-color: rgb(64, 218, 238);">
+      <!-- Condicional: Este bloque SOLO se renderiza si el usuario está en un dispositivo móvil -->
+      @if (isHandset$ | async) {
+        <button
+          type="button"
+          aria-label="Toggle sidenav"
+          mat-icon-button
+          (click)="drawer.toggle()"
+        >
+          <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+        </button>
+      }
+      <span>Encuestas</span>
+    </mat-toolbar>
+    <!-- Router Outlet: Es el "marco dinámico" o "pantalla de TV". 
+         Aquí es donde Angular inyecta los componentes (Tabla de Usuarios, Encuestas, etc.) 
+         cuando el usuario hace clic en el menú lateral. -->
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>
