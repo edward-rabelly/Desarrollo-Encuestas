@@ -19,8 +19,7 @@ export interface Usuario {
 })
 export class UsuarioService {
   // 2. URL de TU backend local (asegúrate de que el backend esté corriendo con 'npm run dev')
-  private apiUrl = 'http://localhost:3000/api/usuarios';
-
+  private apiUrl = 'https://api-encuestas-2vld.onrender.com/api/usuarios';
   constructor(private http: HttpClient) {}
 
   // 3. Obtener todos los usuarios (antes getClientes)

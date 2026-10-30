@@ -31,9 +31,9 @@ export interface Respuesta {
 })
 export class EncuestaService {
   // 3. URLs de TU backend local
-  private apiUrl = 'http://localhost:3000/api/encuestas';
-  private apiPreguntasUrl = 'http://localhost:3000/api/preguntas';
-  private apiRespuestasUrl = 'http://localhost:3000/api/respuestas';
+  private apiUrl = 'https://api-encuestas-2vld.onrender.com/api/encuestas';
+  private apiPreguntasUrl = 'https://api-encuestas-2vld.onrender.com/api/preguntas';
+  private apiRespuestasUrl = 'https://api-encuestas-2vld.onrender.com/api/respuestas';
 
   constructor(private http: HttpClient) {}
 
