@@ -1,0 +1,7 @@
+<div class="avatar-container" *ngIf="usuario">
+  <div class="avatar-circle" [style.backgroundColor]="colorAvatar">
+    {{ iniciales }}
+  </div>
+  <span class="user-name">{{ usuario.nombre }}</span>
+  <button class="logout-btn" (click)="cerrarSesion()" title="Cerrar sesión">Salir</button>
+</div>

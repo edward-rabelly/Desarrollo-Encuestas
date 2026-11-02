@@ -24,6 +24,11 @@ mat-sidenav-content {
   padding: 20px; /* Agrega un espacio de 20 píxeles alrededor del contenido */
 }
 
+
+.spacer {
+  flex: 1 1 auto;
+}
+
 /*Esta es la otra barra azul pero es de tamaño fijo, lo que esta demas es que cada vez que haya contenido debajo de esta qeu tenga un espácio
 *de unos 20 pixeles
 */

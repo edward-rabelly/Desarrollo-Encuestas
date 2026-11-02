@@ -1,5 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild, OnInit } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common'; // <-- Necesario para *ngIf
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
@@ -8,38 +9,64 @@ import { MatButtonModule } from '@angular/material/button';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-import { AsyncPipe } from '@angular/common';
+
+
+import { LoginModalComponent } from '../../componentes/login-modal/login-modal';
+import { AvatarUsuarioComponent } from '../../componentes/avatar-usuario/avatar-usuario';
 
 @Component({
   selector: 'app-menu',
-  standalone: true, // Indica que es un Componente Standalone (no requiere NgModule)
+  standalone: true,
   imports: [
+    CommonModule, // <-- Agregado
     RouterLink,
     RouterOutlet,
-    AsyncPipe,
     MatSidenavModule,
     MatToolbarModule,
     MatListModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    LoginModalComponent,    // <-- Agregado
+    AvatarUsuarioComponent  // <-- Agregado
   ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.css'
 })
-export class MenuComponent {
-  // Inyectamos el servicio de Angular CDK para observar los cambios de tamaño de pantalla
+export class MenuComponent implements OnInit {
   private breakpointObserver = inject(BreakpointObserver);
   
-  /**
-   * Observable que detecta si el dispositivo es un "Handset" (celular o tablet pequeña).
-   * Utiliza programación reactiva (RxJS) para emitir true o false en tiempo real.
-   */
   isHandset$: Observable<boolean> = this.breakpointObserver
     .observe(Breakpoints.Handset)
     .pipe(
-      // Transforma el resultado complejo en un simple booleano (true si es móvil, false si es PC)
       map(result => result.matches),
-      // Optimización: Comparte la última emisión con nuevos suscriptores para evitar múltiples observaciones
       shareReplay()
     );
+
+  // 👇 VARIABLES Y MÉTODOS PARA EL LOGIN 👇
+  usuarioLogueado: any = null;
+  
+  // Referencia al modal para poder abrirlo con un botón
+  @ViewChild('modalLogin') modalLogin!: LoginModalComponent;
+
+  ngOnInit() {
+    // Al iniciar, revisamos si ya hay un usuario guardado en el navegador
+    const dato = localStorage.getItem('usuario');
+    if (dato) {
+      this.usuarioLogueado = JSON.parse(dato);
+    }
+  }
+
+  abrirLogin() {
+    this.modalLogin.abrirModal();
+  }
+
+  onLoginExitoso(usuario: any) {
+    this.usuarioLogueado = usuario;
+  }
+
+  onSesionCerrada() {
+    this.usuarioLogueado = null;
+    // Opcional: recargar la página para limpiar estados
+    window.location.reload();
+  }
 }

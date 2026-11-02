@@ -1,0 +1,10 @@
+.avatar-container { display: flex; align-items: center; gap: 12px; }
+.avatar-circle {
+  width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: bold; font-size: 1.1rem; text-transform: uppercase; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.user-name { font-weight: 600; color: #333; font-size: 0.95rem; }
+.logout-btn {
+  background: transparent; color: #e53935; border: 1px solid #e53935; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: 0.3s;
+}
+.logout-btn:hover { background: #e53935; color: white; }

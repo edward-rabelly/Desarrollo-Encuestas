@@ -1,0 +1,66 @@
+<div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="cerrarModal()">×</button>
+    
+    <h2>{{ modo === 'login' ? 'Iniciar Sesión' : 'Registrarse' }}</h2>
+    
+    <div class="tabs">
+      <button [class.active]="modo === 'login'" (click)="cambiarModo('login')">Iniciar Sesión</button>
+      <button [class.active]="modo === 'registro'" (click)="cambiarModo('registro')">Registrarse</button>
+    </div>
+
+    <form (ngSubmit)="enviarFormulario()">
+      <!-- Campos exclusivos del Registro -->
+      <div *ngIf="modo === 'registro'" class="form-group">
+        <label>Nombre completo:</label>
+        <input type="text" [(ngModel)]="usuario.nombre" name="nombre" required>
+      </div>
+
+      <div *ngIf="modo === 'registro'" class="form-row">
+        <div class="form-group">
+          <label>Tipo Doc.:</label>
+          <select [(ngModel)]="usuario.tipo_documento" name="tipo_documento" required>
+            <option value="CC">CC</option>
+            <option value="TI">TI</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Número:</label>
+          <input type="text" [(ngModel)]="usuario.numero_documento" name="numero_documento" required>
+        </div>
+      </div>
+
+      <div *ngIf="modo === 'registro'" class="form-row">
+        <div class="form-group">
+          <label>Edad:</label>
+          <input type="number" [(ngModel)]="usuario.edad" name="edad" required>
+        </div>
+        <div class="form-group">
+          <label>Género:</label>
+          <select [(ngModel)]="usuario.genero" name="genero" required>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Campos comunes -->
+      <div class="form-group">
+        <label>Correo electrónico:</label>
+        <input type="email" [(ngModel)]="usuario.email" name="email" required>
+      </div>
+
+      <div class="form-group">
+        <label>Contraseña:</label>
+        <input type="password" [(ngModel)]="usuario.contrasena" name="contrasena" required>
+      </div>
+
+      <button type="submit" class="submit-btn">
+        {{ modo === 'login' ? 'Ingresar' : 'Crear Cuenta' }}
+      </button>
+
+      <p *ngIf="mensaje" [class.error]="esError">{{ mensaje }}</p>
+    </form>
+  </div>
+</div>
