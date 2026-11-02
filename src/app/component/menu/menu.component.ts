@@ -51,8 +51,11 @@ export class MenuComponent implements OnInit {
   ngOnInit() {
     // Al iniciar, revisamos si ya hay un usuario guardado en el navegador
     const dato = localStorage.getItem('usuario');
-    if (dato) {
-      this.usuarioLogueado = JSON.parse(dato);
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const dato = localStorage.getItem('usuario');
+      if (dato) {
+        this.usuarioLogueado = JSON.parse(dato);
+      }
     }
   }
 

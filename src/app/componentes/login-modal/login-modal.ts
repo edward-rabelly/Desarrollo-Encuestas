@@ -7,8 +7,8 @@ import { HttpClient } from '@angular/common/http';
   selector: 'app-login-modal',
   standalone: true, // Importante si usas Angular 14+
   imports: [CommonModule, FormsModule],
-  templateUrl: './login-modal.component.html',
-  styleUrls: ['./login-modal.component.css']
+  templateUrl: './login-modal.html',
+  styleUrls: ['./login-modal.css']
 })
 export class LoginModalComponent {
   @Output() loginExitoso = new EventEmitter<any>();
@@ -20,11 +20,11 @@ export class LoginModalComponent {
 
   usuario = {
     nombre: '',
-    tipo_documento: 'CC',
+    tipo_documento: '',
     numero_documento: '',
     email: '',
-    edad: 25,
-    genero: 'Masculino',
+    edad: null, 
+    genero: '',
     contrasena: ''
   };
 
@@ -78,6 +78,8 @@ export class LoginModalComponent {
   }
 
   limpiarFormulario() {
-    this.usuario = { nombre: '', tipo_documento: 'CC', numero_documento: '', email: '', edad: 25, genero: 'Masculino', contrasena: '' };
+    this.usuario = { nombre: '', tipo_documento: 'CC', numero_documento: '', email: '', edad: null, genero: '', contrasena: '' };
   }
 }
+
+

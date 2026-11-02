@@ -10,16 +10,18 @@
     </div>
 
     <form (ngSubmit)="enviarFormulario()">
-      <!-- Campos exclusivos del Registro -->
+      <!-- Campo Nombre -->
       <div *ngIf="modo === 'registro'" class="form-group">
         <label>Nombre completo:</label>
         <input type="text" [(ngModel)]="usuario.nombre" name="nombre" required>
       </div>
 
+      <!-- Fila: Tipo de Documento y Número -->
       <div *ngIf="modo === 'registro'" class="form-row">
         <div class="form-group">
           <label>Tipo Doc.:</label>
           <select [(ngModel)]="usuario.tipo_documento" name="tipo_documento" required>
+            <option value="">Seleccione...</option>
             <option value="CC">CC</option>
             <option value="TI">TI</option>
           </select>
@@ -30,6 +32,7 @@
         </div>
       </div>
 
+      <!-- Fila: Edad y Género -->
       <div *ngIf="modo === 'registro'" class="form-row">
         <div class="form-group">
           <label>Edad:</label>
@@ -38,6 +41,7 @@
         <div class="form-group">
           <label>Género:</label>
           <select [(ngModel)]="usuario.genero" name="genero" required>
+            <option value="">Seleccione...</option>
             <option value="Masculino">Masculino</option>
             <option value="Femenino">Femenino</option>
             <option value="Otro">Otro</option>
@@ -45,7 +49,7 @@
         </div>
       </div>
 
-      <!-- Campos comunes -->
+      <!-- Campos comunes (Login y Registro) -->
       <div class="form-group">
         <label>Correo electrónico:</label>
         <input type="email" [(ngModel)]="usuario.email" name="email" required>

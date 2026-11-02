@@ -5,8 +5,8 @@ import { CommonModule } from '@angular/common';
   selector: 'app-avatar-usuario',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './avatar-usuario.component.html',
-  styleUrls: ['./avatar-usuario.component.css']
+  templateUrl: './avatar-usuario.html',
+  styleUrls: ['./avatar-usuario.css']
 })
 export class AvatarUsuarioComponent implements OnInit {
   @Output() sesionCerrada = new EventEmitter<void>();
