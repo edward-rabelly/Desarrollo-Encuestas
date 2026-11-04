@@ -1,17 +1,9 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-
-import { UsuarioService, Usuario } from '../../servicios/usuario.service';
-
-// Interfaz que combina los datos del usuario + el historial anidado que espera tu HTML
-export interface UsuarioConHistorial extends Usuario {
-  expandida: boolean;
-  historialCargado: boolean; // Para saber si ya pedimos los datos al backend
-  respuestas: any[]; // Aquí guardaremos el historial anidado
-}
+import { UsuarioService } from '../../servicios/usuario.service';
 
 @Component({
   selector: 'app-usuario',
@@ -22,63 +14,82 @@ export interface UsuarioConHistorial extends Usuario {
 })
 export class UsuarioComponent implements OnInit {
   
-  // Ajustamos las columnas para que coincidan con tu HTML
-  displayedColumns: string[] = ['id', 'nombre', 'email', 'fecha_registro', 'historial'];
+  // 1. Columnas dinámicas (se llenan solas)
+  displayedColumns: string[] = [];
   
-  dataSource: UsuarioConHistorial[] = [];
+  // 2. Datos PUROS del backend (sin agregarle propiedades falsas)
+  dataSource: any[] = [];
+  
+  // 3. Estado de la UI separado de los datos (¡La forma profesional!)
+  expandedRows = new Set<number>();       // Guarda los IDs de las filas abiertas
+  loadedHistory = new Set<number>();      // Guarda los IDs que ya cargaron su historial
+  historyData: { [key: number]: any[] } = {}; // Guarda el historial por ID de usuario
 
-  constructor(
-    private usuarioService: UsuarioService,
-    private cdr: ChangeDetectorRef 
-  ) {}
+  constructor(private usuarioService: UsuarioService) {}
 
   ngOnInit() {
-    this.cargarUsuariosBasicos();
+    this.cargarUsuarios();
   }
 
-  // 1. Carga solo la lista básica de usuarios (rápido)
-  cargarUsuariosBasicos() {
+  cargarUsuarios() {
     this.usuarioService.getClientes().subscribe({
       next: (data) => {
-        // Mapeamos los datos del backend a nuestra interfaz de UI
-        this.dataSource = data.map(user => ({
-          ...user,
-          id: user.id_usuario, // Tu HTML usa 'id', el backend devuelve 'id_usuario'
-          fecha_registro: '2026-01-01', // Dato ficticio si no está en la BD, o ajústalo
-          expandida: false,
-          historialCargado: false,
-          respuestas: []
-        }));
-         this.cdr.detectChanges(); 
+        // Asignamos los datos puros, tal cual vienen de la BD
+        this.dataSource = data;
+        
+        // 🚀 MAGIA: Extraer columnas automáticamente del primer registro
+        if (data && data.length > 0) {
+          this.displayedColumns = Object.keys(data[0]).filter(key => 
+            key !== 'contrasena' && key !== 'password' // Filtramos solo lo sensible
+          );
+          // Agregamos la columna de acciones al final para el botón
+          this.displayedColumns.push('acciones');
+        }
       },
       error: (err) => console.error('Error cargando usuarios:', err)
     });
   }
 
-  // 2. Lógica del botón "Ver Historial"
-  toggleUsuario(usuario: UsuarioConHistorial): void {
-    usuario.expandida = !usuario.expandida;
-
-    // Si se expande Y aún no hemos cargado su historial, lo pedimos al backend
-    if (usuario.expandida && !usuario.historialCargado) {
-      this.cargarHistorial(usuario);
+  // Alternar la fila (abrir/cerrar) usando el ID, sin tocar el objeto de datos
+  toggleUsuario(usuario: any): void {
+    const id = usuario.id_usuario;
+    
+    if (this.expandedRows.has(id)) {
+      this.expandedRows.delete(id); // Cerrar
+    } else {
+      this.expandedRows.add(id);    // Abrir
+      
+      // Si es la primera vez que se abre, cargamos el historial
+      if (!this.loadedHistory.has(id)) {
+        this.cargarHistorial(usuario);
+      }
     }
   }
 
-  // 3. Llama al nuevo endpoint del backend
-  cargarHistorial(usuario: UsuarioConHistorial): void {
-    this.usuarioService.getHistorialUsuario(usuario.id_usuario!).subscribe({
+  cargarHistorial(usuario: any) {
+    this.usuarioService.getHistorialUsuario(usuario.id_usuario).subscribe({
       next: (historial) => {
-        usuario.respuestas = historial; // ¡Aquí encaja perfecto con tu HTML!
-        usuario.historialCargado = true;
-        console.log(`Historial cargado para ${usuario.nombre}:`, historial);
+        this.historyData[usuario.id_usuario] = historial;
+        this.loadedHistory.add(usuario.id_usuario);
       },
-      error: (err) => {
-        console.error('Error cargando historial:', err);
-        usuario.respuestas = [];
-        usuario.historialCargado = true;
-      }
+      error: (err) => console.error('Error cargando historial:', err)
     });
+  }
+
+  // Helpers para el HTML
+  isExpanded(id: number): boolean {
+    return this.expandedRows.has(id);
+  }
+
+  getHistorial(id: number): any[] {
+    return this.historyData[id] || [];
   }
 }
 //hosting verser despliegue 
+
+// actualizar las tablas a una generica 
+//Input () data: any[] = []; imdasput quiere decir que traiga algo, el any quiere decir cualquiera pero debe tener una estructura
+//arreglo con todas las columnas y los datos
+// displayedcolumns, va algo dentro this.data foreach es uno por uno push es incertar informacion
+// ng for ="let colum oasdasadf displayedcolumns" es para colcocar tantas columnas como sea posible con el titulo td 
+// va desde ts a html 
