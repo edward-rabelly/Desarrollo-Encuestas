@@ -1,19 +1,20 @@
+<!-- TABLA DINÁMICA DE USUARIOS CON ng-container -->
 <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" style="width: 100%;">
 
-  <!-- Columnas dinámicas automáticas -->
+  <!-- 🚀 ESTRUCTURA DINÁMICA CON ng-container (Igual que en encuestas) -->
   <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
     
-    <!-- Si es la columna de acciones, mostramos el botón -->
+    <!-- Si la columna es 'acciones', mostramos el botón de expandir -->
     <ng-container *ngIf="column === 'acciones'; else defaultColumn">
       <th mat-header-cell *matHeaderCellDef> Acciones </th>
       <td mat-cell *matCellDef="let element">
-        <button mat-icon-button color="primary" (click)="toggleUsuario(element)">
+        <button mat-icon-button color="primary" (click)="toggleUsuario(element)" title="Ver historial">
           <mat-icon>{{ isExpanded(element.id_usuario) ? 'expand_less' : 'expand_more' }}</mat-icon>
         </button>
       </td>
     </ng-container>
 
-    <!-- Para las demás columnas, mostramos el dato puro -->
+    <!-- Para las demás columnas (id_usuario, nombre, email, etc.), mostramos el dato puro -->
     <ng-template #defaultColumn>
       <th mat-header-cell *matHeaderCellDef> {{ column | titlecase }} </th>
       <td mat-cell *matCellDef="let element"> {{ element[column] }} </td>
@@ -24,10 +25,11 @@
   <!-- Fila de cabecera -->
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   
-  <!-- Fila de datos -->
+  <!-- Fila de datos (clickeable para expandir) -->
   <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
       [class.expanded-row]="isExpanded(row.id_usuario)"
-      (click)="toggleUsuario(row)">
+      (click)="toggleUsuario(row)"
+      style="cursor: pointer;">
   </tr>
 
   <!-- Fila expandida (Historial) -->
@@ -37,27 +39,35 @@
   <ng-container matColumnDef="historial">
     <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
       
-      <!-- Solo se muestra si esta fila específica está expandida -->
-      <div class="historial-content" *ngIf="isExpanded(element.id_usuario)" style="padding: 15px; background: #f9f9f9;">
-        <h4 style="margin-top: 0;">Historial de Encuestas</h4>
+      <div class="historial-content" *ngIf="isExpanded(element.id_usuario)" 
+           style="padding: 20px; background: #f9f9f9; border-top: 2px solid #4dd0e1;">
         
-        <!-- Si ya cargó el historial -->
+        <h4 style="margin-top: 0; color: #333;">📋 Historial de Encuestas</h4>
+        
         <div *ngIf="loadedHistory.has(element.id_usuario); else loading">
+          
           <div *ngIf="getHistorial(element.id_usuario).length > 0; else noData">
             <ul style="list-style: none; padding: 0;">
-              <li *ngFor="let item of getHistorial(element.id_usuario)" style="margin-bottom: 8px; padding: 8px; background: white; border-radius: 4px;">
+              <li *ngFor="let item of getHistorial(element.id_usuario)" 
+                  style="margin-bottom: 10px; padding: 12px; background: white; border-radius: 6px; border-left: 3px solid #4dd0e1;">
                 <strong>Encuesta:</strong> {{ item.codigoEncuesta }} <br>
-                <strong>Fecha:</strong> {{ item.fecha }}
+                <strong>Fecha:</strong> {{ item.fecha }} <br>
+                <strong>Estado:</strong> {{ item.estado || 'Completada' }}
               </li>
             </ul>
           </div>
+          
           <ng-template #noData>
-            <p style="color: #666;">Este usuario aún no ha respondido encuestas.</p>
+            <p style="color: #666; font-style: italic;">Este usuario aún no ha respondido encuestas.</p>
           </ng-template>
+          
         </div>
         
         <ng-template #loading>
-          <p style="color: #666;"><mat-icon style="vertical-align: middle; font-size: 16px;">sync</mat-icon> Cargando historial...</p>
+          <p style="color: #666;">
+            <mat-icon style="vertical-align: middle; font-size: 16px;">sync</mat-icon> 
+            Cargando historial...
+          </p>
         </ng-template>
         
       </div>
