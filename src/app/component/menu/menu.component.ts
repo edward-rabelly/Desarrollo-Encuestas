@@ -52,12 +52,14 @@ export class MenuComponent implements OnInit {
   usuarioLogueado: any = null;
   @ViewChild('modalLogin') modalLogin!: LoginModalComponent;
 
-  // --- TABLA GENÉRICA ---
-  @Input() data: any[] = [];
-  @Input() displayedColumns: string[] = []; // Se llenará solo
-  tablaTitulo: string = 'Tabla Dinámica';
+  // --- TABLA DINÁMICA (Solo para la página de inicio) ---
+  data: any[] = [];
+  displayedColumns: string[] = [];
+  tablaTitulo: string = 'Tabla Dinámica de Inicio';
+  mostrarTablaInicio = true;
 
   ngOnInit() {
+    // Login
     if (typeof window !== 'undefined' && window.localStorage) {
       const dato = localStorage.getItem('usuario');
       if (dato) {
@@ -69,41 +71,28 @@ export class MenuComponent implements OnInit {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
-        this.cargarDatosSegunRuta(event.urlAfterRedirects);
+        this.mostrarTablaInicio = (event.urlAfterRedirects === '/' || event.urlAfterRedirects === '');
+        if (this.mostrarTablaInicio) {
+          this.cargarDatosInicio();
+        }
       });
 
     // Carga inicial
-    this.cargarDatosSegunRuta(this.router.url);
+    this.cargarDatosInicio();
   }
 
-  cargarDatosSegunRuta(url: string) {
-    let servicioObservable: Observable<any>;
-
-    // 1. Decidimos qué servicio usar según la URL
-    if (url.includes('/Usuario')) {
-      this.tablaTitulo = 'Tabla de Usuarios';
-      servicioObservable = this.usuarioService.getClientes();
-    } else if (url.includes('/encuesta')) {
-      this.tablaTitulo = 'Tabla de Encuestas';
-      servicioObservable = this.encuestaService.getEncuestas();
-    } else {
-      this.tablaTitulo = 'Tabla de Usuarios';
-      servicioObservable = this.usuarioService.getClientes();
-    }
-
-    // 2. Nos suscribimos y extraemos las columnas AUTOMÁTICAMENTE
-    servicioObservable.subscribe({
+  cargarDatosInicio() {
+    // Por defecto cargamos usuarios en la página de inicio
+    this.tablaTitulo = 'Tabla Dinámica de Usuarios';
+    this.usuarioService.getClientes().subscribe({
       next: (data) => {
         this.data = data;
         
-        // 🚀 AQUÍ ESTÁ LA MAGIA (Igual que en las imágenes de tu profe)
+        // 🚀 MAGIA: Extraer columnas automáticamente
         if (data && data.length > 0) {
-          // Obtenemos las llaves del primer objeto y filtramos las que no queremos mostrar
           this.displayedColumns = Object.keys(data[0]).filter(key => 
-            key !== 'contrasena' && key !== 'password' // Ocultar datos sensibles
+            key !== 'contrasena' && key !== 'password'
           );
-        } else {
-          this.displayedColumns = [];
         }
       },
       error: (err) => console.error('Error cargando datos:', err)
