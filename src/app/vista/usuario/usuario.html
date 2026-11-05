@@ -37,7 +37,7 @@
         -->
         <button mat-icon-button color="primary" 
                 (click)="toggleUsuario(element); $event.stopPropagation()" 
-                title="Encuestas Hechas">
+                title="Ver historial">
 
           <!-- Cambia el ícono dinámicamente: flecha arriba si está abierto, abajo si está cerrado -->      
           <mat-icon>{{ isExpanded(element.id_usuario) ? 'expand_less' : 'expand_more' }}</mat-icon>
@@ -72,7 +72,7 @@
       <!-- Solo renderiza este bloque si la fila de ESTE usuario específico está expandida -->
       <div *ngIf="isExpanded(element.id_usuario)" style="padding: 20px; background: #f9f9f9; border-top: 2px solid #4dd0e1;">
         
-        <h4 style="margin-top: 0; color: #333;">📋 Historial de Encuestas</h4>
+        <h4 style="margin-top: 0; color: #333;">📋 Encuestas Hechas</h4>
         
 
          <!-- Verifica si ya pedimos los datos al backend para este usuario -->
