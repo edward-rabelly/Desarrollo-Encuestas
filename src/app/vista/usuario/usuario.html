@@ -1,6 +1,6 @@
 <!-- 
   1. DECLARACIÓN DE LA TABLA
-  - mat-table: Directiva de Angular Material que convierte esta tabla en una tabla inteligente.
+  - mat-table: Es una propiedad de angular para hacer tablas inteligentes
   - [dataSource]: Vincula la tabla al arreglo de datos 'dataSource' del archivo .ts
   - multiTemplateDataRows: ¡LA CLAVE! Le dice a Angular que esta tabla tendrá más de una fila 
     por cada dato (la fila normal y la fila expandida del historial). Sin esto, da error.
@@ -22,8 +22,8 @@
       3. COLUMNA ESPECIAL DE ACCIONES
       - Usamos *ngIf para preguntar: "¿La columna actual se llama 'acciones'?"
       - Si es SÍ, mostramos este bloque (el botón). Si es NO, saltamos al #defaultColumn
-    -->    <ng-container *ngIf="column === 'acciones'; else defaultColumn">
-      <th mat-header-cell *matHeaderCellDef> Acciones </th>
+    -->    <ng-container *ngIf="column === 'Historial'; else defaultColumn">
+      <th mat-header-cell *matHeaderCellDef> Historial </th>
       <td mat-cell *matCellDef="let element">
 
 
