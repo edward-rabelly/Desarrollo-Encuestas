@@ -6,8 +6,9 @@
     por cada dato (la fila normal y la fila expandida del historial). Sin esto, da error.
 -->
 
-<table mat-table [dataSource]="dataSource" multiTemplateDataRows class="mat-elevation-z8" style="width: 100%;">
-
+<table mat-table [dataSource]="dataSource" multiTemplateDataRows class="mat-elevation-z8" style="width: 100%;">  <!-- Esto ultimo dice que ocupe toda la pantalla y que puede
+  haber mas tablas abajo -->
+ 
 
 
   <!-- 
@@ -23,7 +24,9 @@
       - Usamos *ngIf para preguntar: "¿La columna actual se llama 'acciones'?"
       - Si es SÍ, mostramos este bloque (el botón). Si es NO, saltamos al #defaultColumn
     -->    <ng-container *ngIf="column === 'acciones'; else defaultColumn">
-      <th mat-header-cell *matHeaderCellDef> Historial </th>
+      <th mat-header-cell *matHeaderCellDef> Historial </th> <!--titulo por defecto --> 
+
+      <!--Busca los datos de ese elemento --> 
       <td mat-cell *matCellDef="let element">
 
 
@@ -34,7 +37,7 @@
         -->
         <button mat-icon-button color="primary" 
                 (click)="toggleUsuario(element); $event.stopPropagation()" 
-                title="Ver historial">
+                title="Encuestas Hechas">
 
           <!-- Cambia el ícono dinámicamente: flecha arriba si está abierto, abajo si está cerrado -->      
           <mat-icon>{{ isExpanded(element.id_usuario) ? 'expand_less' : 'expand_more' }}</mat-icon>
