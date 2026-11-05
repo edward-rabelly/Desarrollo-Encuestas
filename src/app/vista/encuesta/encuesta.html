@@ -1,78 +1,140 @@
-<!-- TABLA PRINCIPAL -->
-<!-- SECCIÓN 1: TABLA PRINCIPAL DE ENCUESTAS (Vista Maestro)                 -->
-<table mat-table [dataSource]="dataSource" class="mat-elevation-z8" style="width: 100%; margin-bottom: 20px;">
-  
-  <!-- Columna: ID de la Encuesta -->
-  <ng-container matColumnDef="idEncuesta">
-    <th mat-header-cell *matHeaderCellDef> ID </th>
-    <td mat-cell *matCellDef="let element"> {{element.idEncuesta}} </td>
-  </ng-container>
-  
-  <!-- Columna: Código de la Encuesta -->
-  <ng-container matColumnDef="codigo">
-    <th mat-header-cell *matHeaderCellDef> Código </th>
-    <td mat-cell *matCellDef="let element"> {{element.codigo}} </td>
+<!-- Loading Spinner -->
+<div *ngIf="isLoading" style="text-align: center; padding: 40px;">
+  <mat-spinner diameter="50" style="margin: 0 auto;"></mat-spinner>
+  <p style="margin-top: 10px; color: #666;">Cargando encuestas...</p>
+</div>
+
+<!-- TABLA DINÁMICA DE ENCUESTAS -->
+<table mat-table [dataSource]="dataSource" class="mat-elevation-z8" style="width: 100%; margin-bottom: 20px;" *ngIf="!isLoading">
+
+  <!-- Columnas dinámicas automáticas -->
+  <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
+    
+    <!-- Si es la columna de acciones (participar) -->
+    <ng-container *ngIf="column === 'participar'; else defaultColumn">
+      <th mat-header-cell *matHeaderCellDef> Participar </th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-raised-button color="primary" (click)="toggleEncuesta(element)">
+          <mat-icon style="margin-right: 5px; font-size: 18px;">assignment</mat-icon>
+          {{element.expandida ? 'Ocultar' : 'Realizar Encuesta'}}
+        </button>
+      </td>
+    </ng-container>
+
+    <!-- Para las demás columnas (idEncuesta, codigo, descripcion) -->
+    <ng-template #defaultColumn>
+      <th mat-header-cell *matHeaderCellDef> {{ column | titlecase }} </th>
+      <td mat-cell *matCellDef="let element"> {{ element[column] }} </td>
+    </ng-template>
+    
   </ng-container>
 
-  <!-- Columna: Descripción de la Encuesta -->
-  <ng-container matColumnDef="descripcion">
-    <th mat-header-cell *matHeaderCellDef> Descripción </th>
-    <td mat-cell *matCellDef="let element"> {{element.descripcion}} </td>
-  </ng-container>
-  
-  <!-- Columna: Acciones (Botón para expandir/colapsar) -->
-  <ng-container matColumnDef="participar">
-    <th mat-header-cell *matHeaderCellDef> participar </th>
-    <td mat-cell *matCellDef="let element">
-      <button mat-raised-button color="primary" (click)="toggleEncuesta(element)">
-        <mat-icon>assignment</mat-icon>
-        {{element.expandida ? 'Ocultar' : 'Realizar Encuesta'}}
-      </button>
-    </td>
-  </ng-container>
-  
-  <!-- Filas de encabezado y filas de datos de la tabla -->
+  <!-- Fila de encabezado -->
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  
+  <!-- Fila de datos -->
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+  <!-- Mensaje si no hay datos -->
+  <tr *ngIf="dataSource.length === 0">
+    <td [attr.colspan]="displayedColumns.length" style="text-align: center; padding: 20px; color: #999;">
+      No hay encuestas disponibles
+    </td>
+  </tr>
 
 </table>
 
-<!-- BLOQUE DE PREGUNTAS (Aparece debajo de la tabla) -->
-<!-- SECCIÓN 2: BLOQUE DE PREGUNTAS (Vista Detalle / Expandible)             -->
+<!-- BLOQUE DE PREGUNTAS (Se muestra cuando una encuesta está expandida) -->
 <div *ngFor="let encuesta of dataSource">
   
-  <!-- Iteramos sobre el mismo dataSource para buscar las encuestas expandidas -->
-  <div *ngIf="encuesta.expandida" style="margin-bottom: 30px; padding: 20px; background-color: #f9f9f9; border-left: 5px solid #40daee; border-radius: 4px;">
+  <div *ngIf="encuesta.expandida" style="margin-bottom: 30px; padding: 25px; background-color: #f9f9f9; border-left: 5px solid #40daee; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
     
-    <h3 style="margin-top: 0; color: #333;">Preguntas de: {{encuesta.codigo}}</h3>
+    <h3 style="margin-top: 0; color: #333; border-bottom: 2px solid #40daee; padding-bottom: 10px;">
+      📋 Preguntas de: {{encuesta.codigo}} - {{encuesta.descripcion}}
+    </h3>
     
-    <div *ngFor="let pregunta of encuesta.preguntas; let i = index" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
-  <p style="font-weight: bold; margin-bottom: 10px;">{{i + 1}}. {{pregunta.descripcion}}</p>
-  
-  <!-- ✅ CONDICIÓN CORREGIDA: Si el tipo es 'si_no' -->
-  <div *ngIf="pregunta.tipo === 'si_no'" style="display: flex; gap: 20px;">
-    <label style="cursor: pointer;">
-      <input type="radio" 
-             [name]="'pregunta_' + pregunta.id_pregunta" 
-             value="si" 
-             [(ngModel)]="pregunta.respuestaUsuario"> Sí
-    </label>
-    <label style="cursor: pointer;">
-      <input type="radio" 
-             [name]="'pregunta_' + pregunta.id_pregunta" 
-             value="no" 
-             [(ngModel)]="pregunta.respuestaUsuario"> No
-    </label>
+    <!-- Mensaje si no hay preguntas cargadas -->
+    <div *ngIf="!encuesta.preguntasCargadas" style="text-align: center; padding: 20px;">
+      <mat-spinner diameter="30" style="margin: 0 auto;"></mat-spinner>
+      <p style="margin-top: 10px; color: #666;">Cargando preguntas...</p>
+    </div>
+
+    <!-- Lista de preguntas -->
+    <div *ngIf="encuesta.preguntasCargadas && encuesta.preguntas.length > 0">
+      
+      <div *ngFor="let pregunta of encuesta.preguntas; let i = index" 
+           style="margin-bottom: 25px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);">
+        
+        <p style="font-weight: bold; margin-bottom: 15px; color: #333; font-size: 16px;">
+          {{i + 1}}. {{pregunta.descripcion}}
+          <span *ngIf="pregunta.tipo" style="font-weight: normal; font-size: 12px; color: #999; margin-left: 10px;">
+            ({{pregunta.tipo}})
+          </span>
+        </p>
+        
+        <!-- ✅ TIPO: si_no (Radio buttons Sí/No) -->
+        <div *ngIf="pregunta.tipo === 'si_no'" style="display: flex; gap: 30px;">
+          <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+            <input type="radio" 
+                   [name]="'pregunta_' + pregunta.id_pregunta" 
+                   value="si" 
+                   [(ngModel)]="pregunta.respuestaUsuario"
+                   style="width: 18px; height: 18px; cursor: pointer;">
+            <span style="font-size: 15px;">Sí</span>
+          </label>
+          <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+            <input type="radio" 
+                   [name]="'pregunta_' + pregunta.id_pregunta" 
+                   value="no" 
+                   [(ngModel)]="pregunta.respuestaUsuario"
+                   style="width: 18px; height: 18px; cursor: pointer;">
+            <span style="font-size: 15px;">No</span>
+          </label>
+        </div>
+        
+        <!-- ✅ TIPO: opcion_multiple o texto (Textarea) -->
+        <div *ngIf="pregunta.tipo === 'opcion_multiple' || pregunta.tipo === 'texto' || pregunta.tipo === 'Texto'">
+          <textarea 
+            [(ngModel)]="pregunta.respuestaUsuario"
+            [name]="'respuesta_' + pregunta.id_pregunta" 
+            rows="4" 
+            style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit; font-size: 14px; resize: vertical;"
+            placeholder="Escribe tu respuesta aquí...">
+          </textarea>
+        </div>
+
+        <!-- ✅ TIPO: Por defecto (si no coincide con ninguno) -->
+        <div *ngIf="pregunta.tipo !== 'si_no' && pregunta.tipo !== 'opcion_multiple' && pregunta.tipo !== 'texto' && pregunta.tipo !== 'Texto'">
+          <input 
+            type="text"
+            [(ngModel)]="pregunta.respuestaUsuario"
+            [name]="'respuesta_' + pregunta.id_pregunta" 
+            style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;"
+            placeholder="Escribe tu respuesta...">
+        </div>
+
+      </div>
+
+      <!-- 👇 BOTÓN DE ENVIAR RESPUESTAS 👇 -->
+      <div style="margin-top: 30px; text-align: right;">
+        <button 
+          mat-raised-button 
+          color="accent" 
+          (click)="enviarRespuestas(encuesta)"
+          style="padding: 12px 30px; font-size: 16px; font-weight: bold;">
+          <mat-icon style="margin-right: 8px; vertical-align: middle;">send</mat-icon>
+          Enviar Respuestas
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Mensaje si no hay preguntas -->
+    <div *ngIf="encuesta.preguntasCargadas && encuesta.preguntas.length === 0" style="text-align: center; padding: 20px; color: #999;">
+      <mat-icon style="font-size: 48px; color: #ccc;">inbox</mat-icon>
+      <p style="margin-top: 10px;">Esta encuesta no tiene preguntas registradas</p>
+    </div>
+
   </div>
-  
-  <!-- ✅ CONDICIÓN CORREGIDA: Si el tipo es 'opcion_multiple' -->
-  <div *ngIf="pregunta.tipo === 'opcion_multiple'">
-    <textarea 
-      [(ngModel)]="pregunta.respuestaUsuario"
-      [name]="'respuesta_' + pregunta.id_pregunta" 
-      rows="3" 
-      style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"
-      placeholder="Escribe tu respuesta aquí...">
-    </textarea>
-  </div>
+
 </div>
