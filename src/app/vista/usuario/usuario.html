@@ -8,7 +8,9 @@
     <ng-container *ngIf="column === 'acciones'; else defaultColumn">
       <th mat-header-cell *matHeaderCellDef> Acciones </th>
       <td mat-cell *matCellDef="let element">
-        <button mat-icon-button color="primary" (click)="toggleUsuario(element)" title="Ver historial">
+        <button mat-icon-button color="primary" 
+                (click)="toggleUsuario(element); $event.stopPropagation()" 
+                title="Ver historial">
           <mat-icon>{{ isExpanded(element.id_usuario) ? 'expand_less' : 'expand_more' }}</mat-icon>
         </button>
       </td>
@@ -37,7 +39,7 @@
                  style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #4dd0e1;">
               
               <h5 style="margin: 0 0 10px 0; color: #333;">
-                📝 {{ encuesta.codigoEncuesta }} 
+                 {{ encuesta.codigoEncuesta }} 
                 <span style="font-size: 12px; color: #999; margin-left: 10px;">
                   ({{ encuesta.fecha }} - {{ encuesta.estado }})
                 </span>
@@ -77,11 +79,8 @@
   <!-- Fila de cabecera -->
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   
-  <!-- Fila de datos principal -->
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
-      (click)="toggleUsuario(row)"
-      style="cursor: pointer;">
-  </tr>
+  <!-- Fila de datos principal (sin click en toda la fila) -->
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
   <!-- Fila de detalle (Historial) -->
   <tr mat-row *matRowDef="let row; columns: ['historial']" class="detail-row"></tr>
