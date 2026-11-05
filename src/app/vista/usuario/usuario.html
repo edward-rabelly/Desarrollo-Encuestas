@@ -23,7 +23,7 @@
       - Usamos *ngIf para preguntar: "¿La columna actual se llama 'acciones'?"
       - Si es SÍ, mostramos este bloque (el botón). Si es NO, saltamos al #defaultColumn
     -->    <ng-container *ngIf="column === 'acciones'; else defaultColumn">
-      <th mat-header-cell *matHeaderCellDef> Acciones </th>
+      <th mat-header-cell *matHeaderCellDef> Historial </th>
       <td mat-cell *matCellDef="let element">
 
 
