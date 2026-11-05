@@ -1,22 +1,56 @@
-<!-- TABLA DINÁMICA DE USUARIOS CON ng-container -->
-<table mat-table [dataSource]="dataSource" multiTemplateDataRows class="mat-elevation-z8" style="width: 100%;">
+<!-- 
+  1. DECLARACIÓN DE LA TABLA
+  - mat-table: Directiva de Angular Material que convierte esta tabla en una tabla inteligente.
+  - [dataSource]: Vincula la tabla al arreglo de datos 'dataSource' del archivo .ts
+  - multiTemplateDataRows: ¡LA CLAVE! Le dice a Angular que esta tabla tendrá más de una fila 
+    por cada dato (la fila normal y la fila expandida del historial). Sin esto, da error.
+-->
 
-  <!-- Columnas dinámicas automáticas -->
+<table mat-table [dataSource]="dataSource"  class="mat-elevation-z8" style="width: 100%;">
+
+
+
+  <!-- 
+    2. GENERACIÓN DINÁMICA DE COLUMNAS
+    - Recorremos el arreglo 'displayedColumns' (que se crea automáticamente en el .ts con Object.keys).
+    - [matColumnDef]="column": Asigna un nombre único a cada columna para que Angular sepa cómo unirlas después.
+  -->
   <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
-    
-    <!-- Si es la columna de acciones, mostramos el botón de expandir -->
-    <ng-container *ngIf="column === 'acciones'; else defaultColumn">
+
+
+<!-- 
+      3. COLUMNA ESPECIAL DE ACCIONES
+      - Usamos *ngIf para preguntar: "¿La columna actual se llama 'acciones'?"
+      - Si es SÍ, mostramos este bloque (el botón). Si es NO, saltamos al #defaultColumn.
+    -->    <ng-container *ngIf="column === 'acciones'; else defaultColumn">
       <th mat-header-cell *matHeaderCellDef> Acciones </th>
       <td mat-cell *matCellDef="let element">
+
+
+          <!-- 
+          - (click): Llama a la función que abre/cierra el historial.
+          - $event.stopPropagation(): EVITA que el clic se propague a toda la fila. 
+            Así, solo el botón responde, no toda la línea.
+        -->
         <button mat-icon-button color="primary" 
                 (click)="toggleUsuario(element); $event.stopPropagation()" 
                 title="Ver historial">
+
+          <!-- Cambia el ícono dinámicamente: flecha arriba si está abierto, abajo si está cerrado -->      
           <mat-icon>{{ isExpanded(element.id_usuario) ? 'expand_less' : 'expand_more' }}</mat-icon>
         </button>
       </td>
     </ng-container>
 
-    <!-- Para las demás columnas, mostramos el dato puro -->
+
+
+
+   <!-- 
+      4. COLUMNA POR DEFECTO (Para nombre, email, edad, etc.)
+      - Este bloque se ejecuta para TODAS las columnas que NO sean 'acciones'.
+      - {{ column | titlecase }}: Convierte "id_usuario" en "Id Usuario" automáticamente.
+      - {{ element[column] }}: La magia dinámica. Accede a la propiedad del objeto usando el nombre de la columna.
+    -->
     <ng-template #defaultColumn>
       <th mat-header-cell *matHeaderCellDef> {{ column | titlecase }} </th>
       <td mat-cell *matCellDef="let element"> {{ element[column] }} </td>
@@ -24,17 +58,29 @@
     
   </ng-container>
 
-  <!-- Columna especial para el historial expandido -->
+  <!-- 
+    5. DEFINICIÓN DE LA FILA EXPANDIDA (HISTORIAL)
+    - matColumnDef="historial": Le damos un nombre a esta columna oculta.
+    - [attr.colspan]="displayedColumns.length": Hace que esta celda se estire a lo ancho de TODAS las columnas juntas.
+  -->
   <ng-container matColumnDef="historial">
     <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+
+      <!-- Solo renderiza este bloque si la fila de ESTE usuario específico está expandida -->
       <div *ngIf="isExpanded(element.id_usuario)" style="padding: 20px; background: #f9f9f9; border-top: 2px solid #4dd0e1;">
         
         <h4 style="margin-top: 0; color: #333;">📋 Historial de Encuestas</h4>
         
+
+         <!-- Verifica si ya pedimos los datos al backend para este usuario -->
         <div *ngIf="loadedHistory.has(element.id_usuario); else loading">
           
+
+          <!-- Verifica si el historial tiene datos o está vacío -->
           <div *ngIf="getHistorial(element.id_usuario).length > 0; else noData">
             
+
+            <!-- Recorre cada encuesta respondida por este usuario -->
             <div *ngFor="let encuesta of getHistorial(element.id_usuario)" 
                  style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #4dd0e1;">
               
@@ -45,6 +91,8 @@
                 </span>
               </h5>
               
+
+               <!-- Recorre las preguntas y respuestas de esa encuesta específica -->
               <ul style="list-style: none; padding: 0; margin: 0;">
                 <li *ngFor="let item of encuesta.respuestas" 
                     style="padding: 8px; margin-bottom: 5px; background: #f5f5f5; border-radius: 4px;">
@@ -57,6 +105,7 @@
             
           </div>
           
+           <!-- Plantilla que se muestra si el array de historial está vacío -->
           <ng-template #noData>
             <p style="color: #666; font-style: italic; text-align: center; padding: 20px;">
               Este usuario aún no ha respondido encuestas.
@@ -65,6 +114,7 @@
           
         </div>
         
+        <!-- Plantilla que se muestra mientras espera la respuesta del backend -->
         <ng-template #loading>
           <p style="color: #666; text-align: center; padding: 20px;">
             <mat-icon style="vertical-align: middle; font-size: 16px;">sync</mat-icon> 
@@ -76,13 +126,15 @@
     </td>
   </ng-container>
 
-  <!-- Fila de cabecera -->
+  <!-- 
+    6. RENDERIZADO DE LAS FILAS (Donde Angular Material "dibuja" la tabla)
+  -->
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   
-  <!-- Fila de datos principal (sin click en toda la fila) -->
+  <!-- Dibuja las filas de datos normales. Ya no tiene (click) para evitar conflictos con el botón -->
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-  <!-- Fila de detalle (Historial) -->
+  <!-- Dibuja la fila de detalle (historial) SOLO cuando la condición del ng-container de arriba es verdadera -->
   <tr mat-row *matRowDef="let row; columns: ['historial']" class="detail-row"></tr>
 
 </table>
