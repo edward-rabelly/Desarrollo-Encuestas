@@ -14,16 +14,12 @@ import { UsuarioService } from '../../servicios/usuario.service';
 })
 export class UsuarioComponent implements OnInit {
   
-  // 1. Columnas dinámicas (se llenan solas)
   displayedColumns: string[] = [];
-  
-  // 2. Datos PUROS del backend (sin agregarle propiedades falsas)
   dataSource: any[] = [];
   
-  // 3. Estado de la UI separado de los datos (¡La forma profesional!)
-  expandedRows = new Set<number>();       // Guarda los IDs de las filas abiertas
-  loadedHistory = new Set<number>();      // Guarda los IDs que ya cargaron su historial
-  historyData: { [key: number]: any[] } = {}; // Guarda el historial por ID de usuario
+  expandedRows = new Set<number>();
+  loadedHistory = new Set<number>();
+  historyData: { [key: number]: any[] } = {};
 
   constructor(private usuarioService: UsuarioService) {}
 
@@ -32,34 +28,37 @@ export class UsuarioComponent implements OnInit {
   }
 
   cargarUsuarios() {
+    console.log('🔄 Intentando cargar usuarios desde el backend...');
+    
     this.usuarioService.getClientes().subscribe({
       next: (data) => {
-        // Asignamos los datos puros, tal cual vienen de la BD
+        console.log('✅ DATOS RECIBIDOS DEL BACKEND:', data); // <--- ESTO ES CLAVE
+        
         this.dataSource = data;
         
-        // 🚀 MAGIA: Extraer columnas automáticamente del primer registro
         if (data && data.length > 0) {
           this.displayedColumns = Object.keys(data[0]).filter(key => 
-            key !== 'contrasena' && key !== 'password' // Filtramos solo lo sensible
+            key !== 'contrasena' && key !== 'password'
           );
-          // Agregamos la columna de acciones al final para el botón
           this.displayedColumns.push('acciones');
+          console.log('📊 Columnas detectadas:', this.displayedColumns);
+        } else {
+          console.warn('⚠️ El backend devolvió un arreglo vacío.');
         }
       },
-      error: (err) => console.error('Error cargando usuarios:', err)
+      error: (err) => {
+        console.error('❌ ERROR AL CARGAR USUARIOS:', err);
+      }
     });
   }
 
-  // Alternar la fila (abrir/cerrar) usando el ID, sin tocar el objeto de datos
   toggleUsuario(usuario: any): void {
     const id = usuario.id_usuario;
     
     if (this.expandedRows.has(id)) {
-      this.expandedRows.delete(id); // Cerrar
+      this.expandedRows.delete(id);
     } else {
-      this.expandedRows.add(id);    // Abrir
-      
-      // Si es la primera vez que se abre, cargamos el historial
+      this.expandedRows.add(id);
       if (!this.loadedHistory.has(id)) {
         this.cargarHistorial(usuario);
       }
@@ -67,16 +66,22 @@ export class UsuarioComponent implements OnInit {
   }
 
   cargarHistorial(usuario: any) {
+    console.log(`🔄 Cargando historial para el usuario ID: ${usuario.id_usuario}`);
+    
     this.usuarioService.getHistorialUsuario(usuario.id_usuario).subscribe({
       next: (historial) => {
+        console.log('✅ HISTORIAL RECIBIDO:', historial);
         this.historyData[usuario.id_usuario] = historial;
         this.loadedHistory.add(usuario.id_usuario);
       },
-      error: (err) => console.error('Error cargando historial:', err)
+      error: (err) => {
+        console.error('❌ ERROR AL CARGAR HISTORIAL:', err);
+        this.historyData[usuario.id_usuario] = [];
+        this.loadedHistory.add(usuario.id_usuario);
+      }
     });
   }
 
-  // Helpers para el HTML
   isExpanded(id: number): boolean {
     return this.expandedRows.has(id);
   }
