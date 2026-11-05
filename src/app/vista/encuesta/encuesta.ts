@@ -100,15 +100,24 @@ export class EncuestaComponent implements OnInit {
       return;
     }
 
-    // 2. ID de usuario (Hardcodeado a 1 por ahora, luego se toma del login)
-    const idUsuario = 1; 
+    // 2. ✅ OBTENER EL ID DEL USUARIO LOGUEADO REAL (Aquí estaba el problema)
+    const usuarioGuardado = localStorage.getItem('usuario');
+    const idUsuario = usuarioGuardado ? JSON.parse(usuarioGuardado).id_usuario : null;
+
+    if (!idUsuario) {
+      alert('❌ Error: No hay un usuario logueado. Por favor inicia sesión primero.');
+      return;
+    }
+
+    console.log(' Enviando respuestas con ID de usuario real:', idUsuario);
+
     let respuestasEnviadas = 0;
     const totalRespuestas = encuesta.preguntas.length;
 
     // 3. Enviar cada respuesta al backend
     encuesta.preguntas.forEach(pregunta => {
       const respuestaData: Respuesta = {
-        id_usuario: idUsuario,
+        id_usuario: idUsuario, // <-- Ahora usa el ID real del usuario logueado
         id_encuesta: encuesta.id_encuesta!,
         id_pregunta: pregunta.id_pregunta!,
         respuesta: pregunta.respuestaUsuario!
