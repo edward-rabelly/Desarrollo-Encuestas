@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,19 +21,18 @@ export class UsuarioComponent implements OnInit {
   loadedHistory = new Set<number>();
   historyData: { [key: number]: any[] } = {};
 
-  constructor(private usuarioService: UsuarioService) {}
+  constructor(
+    private usuarioService: UsuarioService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
     this.cargarUsuarios();
   }
 
   cargarUsuarios() {
-    console.log('🔄 Intentando cargar usuarios desde el backend...');
-    
     this.usuarioService.getClientes().subscribe({
       next: (data) => {
-        console.log('✅ DATOS RECIBIDOS DEL BACKEND:', data); // <--- ESTO ES CLAVE
-        
         this.dataSource = data;
         
         if (data && data.length > 0) {
@@ -41,14 +40,10 @@ export class UsuarioComponent implements OnInit {
             key !== 'contrasena' && key !== 'password'
           );
           this.displayedColumns.push('acciones');
-          console.log('📊 Columnas detectadas:', this.displayedColumns);
-        } else {
-          console.warn('⚠️ El backend devolvió un arreglo vacío.');
         }
+        this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('❌ ERROR AL CARGAR USUARIOS:', err);
-      }
+      error: (err) => console.error('Error cargando usuarios:', err)
     });
   }
 
@@ -66,16 +61,14 @@ export class UsuarioComponent implements OnInit {
   }
 
   cargarHistorial(usuario: any) {
-    console.log(`🔄 Cargando historial para el usuario ID: ${usuario.id_usuario}`);
-    
     this.usuarioService.getHistorialUsuario(usuario.id_usuario).subscribe({
       next: (historial) => {
-        console.log('✅ HISTORIAL RECIBIDO:', historial);
         this.historyData[usuario.id_usuario] = historial;
         this.loadedHistory.add(usuario.id_usuario);
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('❌ ERROR AL CARGAR HISTORIAL:', err);
+        console.error('Error cargando historial:', err);
         this.historyData[usuario.id_usuario] = [];
         this.loadedHistory.add(usuario.id_usuario);
       }
