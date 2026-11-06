@@ -93,7 +93,8 @@ export class EncuestaComponent implements OnInit {
             key !== 'expandida' &&          // Filtramos propiedades de la UI
             key !== 'preguntasCargadas' &&  // Filtramos propiedades de la UI
             key !== 'preguntas' &&          // Filtramos propiedades de la UI
-            key !== 'id_encuesta'           // Filtramos el ID original para no duplicar con 'idEncuesta'
+            key !== 'id_encuesta' &&  
+            key !== 'idEncuesta'         // Filtramos el ID original para no duplicar con 'idEncuesta'
           );
           
           // Agregamos manualmente la columna de acción al final
