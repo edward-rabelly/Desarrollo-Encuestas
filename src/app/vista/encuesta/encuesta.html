@@ -1,16 +1,34 @@
-<!-- Loading Spinner -->
+<!-- 
+  1. ESTADO DE CARGA INICIAL
+  - Se muestra SOLO mientras isLoading es true (al entrar a la página).
+  - Evita que el usuario vea una tabla vacía o rota mientras llegan los datos del backend.
+  🔗 CONEXIÓN TS: this.isLoading = true/false en cargarEncuestas()
+-->
 <div *ngIf="isLoading" style="text-align: center; padding: 40px;">
   <mat-spinner diameter="50" style="margin: 0 auto;"></mat-spinner>
   <p style="margin-top: 10px; color: #666;">Cargando encuestas...</p>
 </div>
 
-<!-- TABLA DINÁMICA DE ENCUESTAS -->
+<!-- 
+  2. TABLA DINÁMICA DE ENCUESTAS
+  - *ngIf="!isLoading": Solo se dibuja cuando los datos YA llegaron.
+  - [dataSource]="dataSource": Vincula la tabla al arreglo de encuestas del TS.
+-->
 <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" style="width: 100%; margin-bottom: 20px;" *ngIf="!isLoading">
 
-  <!-- Columnas dinámicas automáticas -->
+   <!-- 
+    3. GENERADOR DINÁMICO DE COLUMNAS
+    - Recorre el arreglo displayedColumns: string[] = []; del TS.
+    - Crea una definición de columna para cada nombre.
+  -->
   <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
     
-    <!-- Si es la columna de acciones (participar) -->
+    <!-- 
+      4. COLUMNA ESPECIAL DE ACCIÓN ("participar")
+      - Si la columna actual se llama 'participar', ignora el texto normal y muestra este botón.
+      - (click)="toggleEncuesta(element)": Llama al TS para abrir/cerrar el formulario.
+      - {{element.expandida ? 'Ocultar' : 'Realizar Encuesta'}}: Cambia el texto del botón dinámicamente.
+    -->
     <ng-container *ngIf="column === 'participar'; else defaultColumn">
       <th mat-header-cell *matHeaderCellDef> Participar </th>
       <td mat-cell *matCellDef="let element">
@@ -21,7 +39,12 @@
       </td>
     </ng-container>
 
-    <!-- Para las demás columnas (idEncuesta, codigo, descripcion) -->
+    <!-- 
+      5. COLUMNA POR DEFECTO (Para idEncuesta, codigo, descripcion)
+      - Si NO es 'participar', salta aquí (gracias al "else defaultColumn" de arriba).
+      - {{ column | titlecase }}: Convierte "idEncuesta" en "Idencuesta" automáticamente.
+      - {{ element[column] }}: La magia dinámica. Lee el valor de la propiedad (ej: element['codigo']).
+    -->
     <ng-template #defaultColumn>
       <th mat-header-cell *matHeaderCellDef> {{ column | titlecase }} </th>
       <td mat-cell *matCellDef="let element"> {{ element[column] }} </td>
@@ -29,13 +52,11 @@
     
   </ng-container>
 
-  <!-- Fila de encabezado -->
+  <!-- 6. DIBUJADO DE FILAS DE LA TABLA -->
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   
-  <!-- Fila de datos -->
+  <!-- 7. MENSAJE SI LA BASE DE DATOS ESTÁ VACÍA -->
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-
-  <!-- Mensaje si no hay datos -->
   <tr *ngIf="dataSource.length === 0">
     <td [attr.colspan]="displayedColumns.length" style="text-align: center; padding: 20px; color: #999;">
       No hay encuestas disponibles
@@ -44,7 +65,13 @@
 
 </table>
 
-<!-- BLOQUE DE PREGUNTAS (Se muestra cuando una encuesta está expandida) -->
+<!-- 
+  8. BLOQUE DE PREGUNTAS (ACORDEÓN)
+  - Iteramos de nuevo sobre dataSource, pero el *ngIf de abajo filtra para mostrar 
+    SOLO la encuesta que el usuario acaba de expandir.
+  - Nota: Está FUERA de la tabla <table> para permitir formularios complejos sin romper 
+    la estructura de filas de Angular Material.
+-->
 <div *ngFor="let encuesta of dataSource">
   
   <div *ngIf="encuesta.expandida" style="margin-bottom: 30px; padding: 25px; background-color: #f9f9f9; border-left: 5px solid #40daee; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
@@ -53,13 +80,13 @@
       📋 Preguntas de: {{encuesta.codigo}} - {{encuesta.descripcion}}
     </h3>
     
-    <!-- Mensaje si no hay preguntas cargadas -->
+    <!-- 9. SPINNER DE CARGA DE PREGUNTAS (Lazy Loading) -->
     <div *ngIf="!encuesta.preguntasCargadas" style="text-align: center; padding: 20px;">
       <mat-spinner diameter="30" style="margin: 0 auto;"></mat-spinner>
       <p style="margin-top: 10px; color: #666;">Cargando preguntas...</p>
     </div>
 
-    <!-- Lista de preguntas -->
+    <!-- 10. LISTA DE PREGUNTAS (Solo si ya cargaron y hay al menos una) -->
     <div *ngIf="encuesta.preguntasCargadas && encuesta.preguntas.length > 0">
       
       <div *ngFor="let pregunta of encuesta.preguntas; let i = index" 
@@ -72,7 +99,8 @@
           </span>
         </p>
         
-        <!-- ✅ TIPO: si_no (Radio buttons Sí/No) -->
+         <!-- ✅ A. TIPO: si_no (Radio buttons) -->
+        <!-- [name] es CRUCIAL aquí: agrupa los radios para que solo se pueda elegir uno por pregunta -->
         <div *ngIf="pregunta.tipo === 'si_no'" style="display: flex; gap: 30px;">
           <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
             <input type="radio" 
@@ -92,7 +120,7 @@
           </label>
         </div>
         
-        <!-- ✅ TIPO: opcion_multiple o texto (Textarea) -->
+        <!-- ✅ B. TIPO: opcion_multiple o texto (Textarea) -->
         <div *ngIf="pregunta.tipo === 'opcion_multiple' || pregunta.tipo === 'texto' || pregunta.tipo === 'Texto'">
           <textarea 
             [(ngModel)]="pregunta.respuestaUsuario"
@@ -103,7 +131,7 @@
           </textarea>
         </div>
 
-        <!-- ✅ TIPO: Por defecto (si no coincide con ninguno) -->
+        <!-- ✅ C. TIPO: Por defecto (Input simple de texto) -->
         <div *ngIf="pregunta.tipo !== 'si_no' && pregunta.tipo !== 'opcion_multiple' && pregunta.tipo !== 'texto' && pregunta.tipo !== 'Texto'">
           <input 
             type="text"
@@ -115,7 +143,8 @@
 
       </div>
 
-      <!-- 👇 BOTÓN DE ENVIAR RESPUESTAS 👇 -->
+         <!-- 11. BOTÓN DE ENVÍO -->
+      <!-- Llama al método del TS que valida y hace el POST al backend -->
       <div style="margin-top: 30px; text-align: right;">
         <button 
           mat-raised-button 
@@ -129,7 +158,7 @@
 
     </div>
 
-    <!-- Mensaje si no hay preguntas -->
+    <!-- 12. MENSAJE SI LA ENCUESTA NO TIENE PREGUNTAS ASIGNADAS -->
     <div *ngIf="encuesta.preguntasCargadas && encuesta.preguntas.length === 0" style="text-align: center; padding: 20px; color: #999;">
       <mat-icon style="font-size: 48px; color: #ccc;">inbox</mat-icon>
       <p style="margin-top: 10px;">Esta encuesta no tiene preguntas registradas</p>
