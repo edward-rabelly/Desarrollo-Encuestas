@@ -8,6 +8,10 @@ import { RenderMode, ServerRoute } from '@angular/ssr';
  */
 export const serverRoutes: ServerRoute[] = [
   {
+     path: 'preguntas/:id',
+    renderMode: RenderMode.Client,
+  },
+  {
     // El comodín '**' indica que esta regla se aplica a TODAS las rutas de la aplicación.
     path: '**',
     // Establece el modo de renderizado como 'Prerender'.
