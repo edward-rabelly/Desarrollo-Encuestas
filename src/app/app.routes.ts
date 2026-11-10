@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import { EncuestaComponent } from './vista/encuesta/encuesta';
 import { PreguntasComponent } from './vista/preguntas/preguntas';
 import { EncuestaUsuarioComponent } from './vista/encuesta-usuario/encuesta-usuario';
+import { RenderMode } from '@angular/ssr';
 
 
 
@@ -30,6 +31,11 @@ export const routes: Routes = [
     { path: 'preguntas', component: PreguntasComponent },
     { path: 'encuesta-usuario', component: EncuestaUsuarioComponent },
     { path: 'preguntas/:id', component: PreguntasComponent },
+      { 
+    path: 'preguntas/:id', 
+    component: PreguntasComponent,
+    data: { renderMode: RenderMode.Client } 
+  },
     { path: '**',          redirectTo: '' }
 ];
 
