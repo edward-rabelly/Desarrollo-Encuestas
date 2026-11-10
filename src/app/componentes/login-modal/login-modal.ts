@@ -1,14 +1,25 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../../servicios/auth.service'; 
+
+
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-login-modal',
-  standalone: true, // Importante si usas Angular 14+
-  imports: [CommonModule, FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule, MatFormFieldModule, // 👈
+    MatInputModule,     // 👈
+    MatSelectModule,    // 👈
+    MatButtonModule,    // 👈
+    MatIconModule ],
   templateUrl: './login-modal.html',
-  styleUrls: ['./login-modal.css']
+  styleUrl: './login-modal.css' // 👈 Corregido: styleUrl (singular)
 })
 export class LoginModalComponent {
   @Output() loginExitoso = new EventEmitter<any>();
@@ -20,20 +31,26 @@ export class LoginModalComponent {
 
   usuario = {
     nombre: '',
-    tipo_documento: '',
+    tipo_documento: 'CC', // Valor por defecto
     numero_documento: '',
     email: '',
-    edad: null, 
+    edad: null as number | null,
     genero: '',
     contrasena: ''
   };
 
-  private apiUrl = 'https://api-encuestas-2vld.onrender.com/api/usuarios';
+  // 👈 Inyectamos el AuthService, NO el HttpClient
+  constructor(private authService: AuthService) {}
 
-  constructor(private http: HttpClient) {}
+  abrirModal() { 
+    this.mostrarModal = true; 
+    this.mensaje = ''; 
+  }
 
-  abrirModal() { this.mostrarModal = true; this.mensaje = ''; }
-  cerrarModal() { this.mostrarModal = false; this.limpiarFormulario(); }
+  cerrarModal() { 
+    this.mostrarModal = false; 
+    this.limpiarFormulario(); 
+  }
   
   cambiarModo(modo: 'login' | 'registro') {
     this.modo = modo;
@@ -46,13 +63,12 @@ export class LoginModalComponent {
     this.modo === 'login' ? this.iniciarSesion() : this.registrar();
   }
 
-  iniciarSesion() {
-    this.http.post(`${this.apiUrl}/login`, {
-      email: this.usuario.email,
-      contrasena: this.usuario.contrasena
-    }).subscribe({
+   iniciarSesion() {
+    this.authService.login(this.usuario.email, this.usuario.contrasena).subscribe({
       next: (respuesta: any) => {
-        localStorage.setItem('usuario', JSON.stringify(respuesta.usuario));
+        // ✅ CAMBIO CLAVE: Usamos el método del servicio que notifica a todos los componentes
+        this.authService.guardarSesion(respuesta.usuario);
+        
         this.loginExitoso.emit(respuesta.usuario);
         this.cerrarModal();
       },
@@ -64,9 +80,11 @@ export class LoginModalComponent {
   }
 
   registrar() {
-    this.http.post(this.apiUrl, this.usuario).subscribe({
+    this.authService.registrar(this.usuario).subscribe({
       next: (respuesta: any) => {
-        localStorage.setItem('usuario', JSON.stringify(respuesta));
+        // ✅ CAMBIO CLAVE: Usamos el método del servicio que notifica a todos los componentes
+        this.authService.guardarSesion(respuesta);
+        
         this.loginExitoso.emit(respuesta);
         this.cerrarModal();
       },
@@ -78,8 +96,17 @@ export class LoginModalComponent {
   }
 
   limpiarFormulario() {
-    this.usuario = { nombre: '', tipo_documento: 'CC', numero_documento: '', email: '', edad: null, genero: '', contrasena: '' };
+    this.usuario = { 
+      nombre: '', 
+      tipo_documento: 'CC', 
+      numero_documento: '', 
+      email: '', 
+      edad: null, 
+      genero: '', 
+      contrasena: '' 
+    };
   }
 }
+
 
 

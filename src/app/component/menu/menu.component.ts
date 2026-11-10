@@ -7,7 +7,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable } from 'rxjs';
+import { Observable, } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 
 import { LoginModalComponent } from '../../componentes/login-modal/login-modal';
@@ -44,7 +44,7 @@ export class MenuComponent implements OnInit {
   // --- LÓGICA DE LOGIN ---
   usuarioLogueado: any = null;
   @ViewChild('modalLogin') modalLogin!: LoginModalComponent;
-
+  
   ngOnInit() {
     if (typeof window !== 'undefined' && window.localStorage) {
       const dato = localStorage.getItem('usuario');

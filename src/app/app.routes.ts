@@ -2,6 +2,10 @@ import { Routes } from '@angular/router';
 import { UsuarioComponent } from './vista/usuario/usuario';
 import { Component } from '@angular/core';
 import { EncuestaComponent } from './vista/encuesta/encuesta';
+import { PreguntasComponent } from './vista/preguntas/preguntas';
+import { EncuestaUsuarioComponent } from './vista/encuesta-usuario/encuesta-usuario';
+
+
 
 /**
  * Componente de Inicio (Home).
@@ -23,8 +27,9 @@ export const routes: Routes = [
     { path: 'Usuario',     component: UsuarioComponent },
     // Ruta para el módulo de Encuestas. Se activa al navegar a /encuesta
     { path: 'encuesta',    component: EncuestaComponent },
-    // Ruta comodín (Wildcard '**'). Captura cualquier URL no definida y redirige al inicio.
-    // Esto previene errores de página en blanco o rutas rotas en el frontend.
+    { path: 'preguntas', component: PreguntasComponent },
+    { path: 'encuesta-usuario', component: EncuestaUsuarioComponent },
+    { path: 'preguntas/:id', component: PreguntasComponent },
     { path: '**',          redirectTo: '' }
 ];
 

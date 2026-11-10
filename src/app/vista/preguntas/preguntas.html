@@ -1,0 +1,65 @@
+<!-- ========================================== -->
+<!-- MODO 1: TABLA DINÁMICA DE TODAS LAS PREGUNTAS -->
+<!-- ========================================== -->
+<div *ngIf="!modoRespuesta">
+  
+  <!-- Spinner de carga de la tabla general -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Cargando preguntas...</p>
+  </div>
+
+  <!-- Tabla Genérica Reutilizable (solo se muestra si NO está cargando) -->
+  <app-tabla *ngIf="!isLoading" [data]="dataSource"></app-tabla>
+
+</div>
+
+<!-- ========================================== -->
+<!-- MODO 2: FORMULARIO PARA RESPONDER ENCUESTA  -->
+<!-- ========================================== -->
+<div *ngIf="modoRespuesta" class="formulario-container">
+  
+  <!-- Spinner de carga específico del formulario -->
+  <div *ngIf="isLoadingPreguntas" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Cargando preguntas de la encuesta...</p>
+  </div>
+
+  <!-- Formulario (solo se muestra cuando YA terminó de cargar) -->
+  <div *ngIf="!isLoadingPreguntas" class="formulario-encuesta">
+    <h2 class="titulo-encuesta">Respondiendo Encuesta #{{ idEncuestaActual }}</h2>
+
+    <div *ngFor="let pregunta of preguntasRespuesta; let i = index" class="pregunta-card">
+      <h4 class="pregunta-texto">
+        {{ i + 1 }}. {{ pregunta.descripcion }} 
+        <span class="tipo-badge">{{ pregunta.tipo }}</span>
+      </h4>
+
+      <!-- Opción Múltiple (Textarea) -->
+      <div *ngIf="pregunta.tipo === 'opcion_multiple'" class="campo-respuesta">
+        <textarea [(ngModel)]="pregunta.respuesta" placeholder="Escribe tu respuesta detallada aquí..." rows="3"></textarea>
+      </div>
+
+      <!-- Sí / No (Radio Buttons de Material) -->
+      <div *ngIf="pregunta.tipo === 'si_no'" class="campo-respuesta">
+        <mat-radio-group [(ngModel)]="pregunta.respuesta">
+          <mat-radio-button value="si">Sí</mat-radio-button>
+          <mat-radio-button value="no">No</mat-radio-button>
+        </mat-radio-group>
+      </div>
+
+      <!-- Texto corto (Input) -->
+      <div *ngIf="pregunta.tipo !== 'opcion_multiple' && pregunta.tipo !== 'si_no'" class="campo-respuesta">
+        <input type="text" [(ngModel)]="pregunta.respuesta" placeholder="Escribe tu respuesta...">
+      </div>
+    </div>
+
+    <div class="acciones-formulario">
+      <button mat-button (click)="cancelarRespuesta()">Cancelar</button>
+      <button mat-raised-button color="primary" (click)="enviarRespuestas()" [disabled]="enviandoRespuestas">
+        {{ enviandoRespuestas ? 'Enviando...' : 'Enviar Respuestas' }}
+      </button>
+    </div>
+
+  </div>
+</div>

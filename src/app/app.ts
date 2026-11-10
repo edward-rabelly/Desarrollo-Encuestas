@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 
 // Importa el componente que actuará como el Layout Maestro de toda la aplicación
 import { MenuComponent } from './component/menu/menu.component';
+import { RouterOutlet } from '@angular/router';
 
 
 /**
@@ -12,7 +13,7 @@ import { MenuComponent } from './component/menu/menu.component';
 @Component({
   selector: 'app-root', // La etiqueta HTML que representa a este componente (<app-root>), index busca esta clase para que la pinte
   standalone: true,  // Arquitectura moderna: no requiere un AppModule (NgModule)
-  imports: [MenuComponent], // Importa directamente el componente del menú para poder usarlo en el HTML
+  imports: [MenuComponent,RouterOutlet], // Importa directamente el componente del menú para poder usarlo en el HTML
   templateUrl: './app.html',// Vincula la plantilla HTML (que contiene <app-menu></app-menu>)
   styleUrl: './app.css' // Vincula los estilos globales de la aplicación
 })

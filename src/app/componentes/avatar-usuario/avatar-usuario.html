@@ -1,12 +1,33 @@
 <div class="avatar-container" *ngIf="usuario">
-  <div class="avatar-circle" [style.backgroundColor]="colorAvatar">
-    {{ iniciales }}
-  </div>
-  <span class="user-name">{{ usuario.nombre }}</span>
-  <button class="logout-btn" (click)="cerrarSesion()" title="Cerrar sesión">Salir</button>
+  
+  <!-- Botón del Avatar que abre el menú -->
+  <button mat-icon-button [matMenuTriggerFor]="menuUsuario" class="avatar-trigger">
+    <div class="avatar-circle" [ngClass]="'color-' + colorIndex">
+      {{ iniciales }}
+    </div>
+  </button>
+
+  <!-- Menú Desplegable -->
+  <mat-menu #menuUsuario="matMenu" class="menu-usuario">
+    
+    <!-- Encabezado del menú con el nombre -->
+    <div class="menu-header">
+      <div class="avatar-circle small" [ngClass]="'color-' + colorIndex">
+        {{ iniciales }}
+      </div>
+      <div class="user-info">
+        <p class="user-name">{{ usuario.nombre }}</p>
+        <p class="user-email">{{ usuario.email }}</p>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Opción Cerrar Sesión -->
+    <button mat-menu-item (click)="cerrarSesion()">
+      <mat-icon>logout</mat-icon>
+      <span>Cerrar Sesión</span>
+    </button>
+
+  </mat-menu>
 </div>
-
-
-
-
-

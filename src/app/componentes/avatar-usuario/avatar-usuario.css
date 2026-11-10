@@ -1,10 +1,78 @@
-.avatar-container { display: flex; align-items: center; gap: 12px; }
+/* Contenedor principal */
+.avatar-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Botón del avatar (sin fondo, solo el círculo) */
+.avatar-trigger {
+  padding: 0 !important;
+}
+
+/* Círculo del avatar */
 .avatar-circle {
-  width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  color: white; font-weight: bold; font-size: 1.1rem; text-transform: uppercase; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  text-transform: uppercase;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.user-name { font-weight: 600; color: #333; font-size: 0.95rem; }
-.logout-btn {
-  background: transparent; color: #e53935; border: 1px solid #e53935; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: 0.3s;
+
+/* Efecto hover en el avatar */
+.avatar-trigger:hover .avatar-circle {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
-.logout-btn:hover { background: #e53935; color: white; }
+
+/* Avatar más pequeño dentro del menú */
+.avatar-circle.small {
+  width: 36px;
+  height: 36px;
+  font-size: 0.9rem;
+}
+
+/* Encabezado del menú */
+.menu-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  margin: 0;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.user-email {
+  margin: 2px 0 0 0;
+  color: #666;
+  font-size: 0.8rem;
+}
+
+/* Paleta de colores para avatares */
+.color-0 { background-color: #e91e63; }
+.color-1 { background-color: #9c27b0; }
+.color-2 { background-color: #673ab7; }
+.color-3 { background-color: #3f51b5; }
+.color-4 { background-color: #2196f3; }
+.color-5 { background-color: #00bcd4; }
+.color-6 { background-color: #009688; }
+.color-7 { background-color: #4caf50; }
+.color-8 { background-color: #ff9800; }
+.color-9 { background-color: #ff5722; }

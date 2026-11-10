@@ -1,47 +1,70 @@
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../servicios/auth.service';
+import { Router } from '@angular/router';
+
+// 👇 Imports de Angular Material
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
   selector: 'app-avatar-usuario',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    MatMenuModule,    // 👈 Para el menú desplegable
+    MatIconModule,    // 👈 Para los íconos
+    MatButtonModule,  // 👈 Para los botones
+    MatDividerModule  // 👈 Para la línea separadora
+  ],
   templateUrl: './avatar-usuario.html',
-  styleUrls: ['./avatar-usuario.css']
+  styleUrl: './avatar-usuario.css'
 })
 export class AvatarUsuarioComponent implements OnInit {
-  @Output() sesionCerrada = new EventEmitter<void>();
   
   usuario: any = null;
-  iniciales = 'U';
-  colorAvatar = '#4dd0e1';
+  iniciales = '';
+  colorIndex = 0;
 
-  ngOnInit() { this.cargarUsuario(); }
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.cargarUsuario();
+  }
 
   cargarUsuario() {
-    const dato = localStorage.getItem('usuario');
-    if (dato) {
-      this.usuario = JSON.parse(dato);
-      this.generarIniciales();
+    this.usuario = this.authService.getUsuarioActual();
+    
+    if (this.usuario) {
+      this.iniciales = this.generarIniciales(this.usuario.nombre);
+      this.colorIndex = this.generarIndiceColor(this.usuario.nombre);
     }
   }
 
-  generarIniciales() {
-    if (this.usuario && this.usuario.nombre) {
-      const partes = this.usuario.nombre.trim().split(' ');
-      const inicial1 = partes[0]?.charAt(0).toUpperCase() || '';
-      const inicial2 = partes.length > 1 ? partes[1]?.charAt(0).toUpperCase() : '';
-      this.iniciales = inicial1 + inicial2;
-      
-      // Colores predefinidos elegantes
-      const colores = ['#4dd0e1', '#ff7043', '#66bb6a', '#ab47bc', '#ffa726', '#29b6f6', '#ef5350'];
-      const indice = this.usuario.nombre.charCodeAt(0) % colores.length;
-      this.colorAvatar = colores[indice];
+  private generarIniciales(nombre: string): string {
+    if (!nombre) return '?';
+    const partes = nombre.split(' ');
+    return partes.length >= 2 
+      ? (partes[0][0] + partes[1][0]).toUpperCase() 
+      : nombre.substring(0, 2).toUpperCase();
+  }
+
+  private generarIndiceColor(texto: string): number {
+    let hash = 0;
+    for (let i = 0; i < texto.length; i++) {
+      hash = texto.charCodeAt(i) + ((hash << 5) - hash);
     }
+    return Math.abs(hash) % 10;
   }
 
   cerrarSesion() {
-    localStorage.removeItem('usuario');
+    this.authService.cerrarSesion();
     this.usuario = null;
-    this.sesionCerrada.emit();
+    this.router.navigate(['/']);
   }
 }

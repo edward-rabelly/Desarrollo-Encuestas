@@ -1,0 +1,76 @@
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 1rem;
+}
+
+.formulario-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.titulo-encuesta {
+  color: #333;
+  border-bottom: 2px solid #4dd0e1;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.pregunta-card {
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.pregunta-texto {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.tipo-badge {
+  font-size: 0.75rem;
+  background: #e0f7fa;
+  color: #006064;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: normal;
+}
+
+.campo-respuesta textarea,
+.campo-respuesta input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.campo-respuesta textarea:focus,
+.campo-respuesta input:focus {
+  outline: none;
+  border-color: #4dd0e1;
+  box-shadow: 0 0 0 2px rgba(77, 208, 225, 0.2);
+}
+
+.campo-respuesta mat-radio-group {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.acciones-formulario {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
