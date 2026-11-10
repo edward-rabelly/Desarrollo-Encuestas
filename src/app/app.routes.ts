@@ -31,11 +31,7 @@ export const routes: Routes = [
     { path: 'preguntas', component: PreguntasComponent },
     { path: 'encuesta-usuario', component: EncuestaUsuarioComponent },
     { path: 'preguntas/:id', component: PreguntasComponent },
-      { 
-    path: 'preguntas/:id', 
-    component: PreguntasComponent,
-    data: { renderMode: RenderMode.Client } 
-  },
+    
     { path: '**',          redirectTo: '' }
 ];
 
