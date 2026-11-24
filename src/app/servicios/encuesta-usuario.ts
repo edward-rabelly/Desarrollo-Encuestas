@@ -17,7 +17,7 @@ export interface EncuestaUsuario {
 export class EncuestaUsuarioService {
   //  Asegúrate de que esta URL sea la correcta de tu backend
   //private apiUrl = 'https://api-encuestas-2vld.onrender.com/api/respuestas';
-  private apiUrl = 'http://localhost:3000/api/respuestas'; 
+  private apiUrl = 'https://api-encuestas-2vld.onrender.com/api/respuestas';
 
   constructor(private http: HttpClient) {}
 
