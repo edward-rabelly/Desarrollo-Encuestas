@@ -4,6 +4,7 @@ import { Router } from '@angular/router'; // 👈 NUEVO: Importar Router
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Tabla } from '../../component/tabla/tabla';
 import { UsuarioService } from '../../servicios/usuario.service';
+import { AuthService } from '../../servicios/auth.service';
 
 @Component({
   selector: 'app-usuario',
@@ -24,7 +25,8 @@ export class UsuarioComponent implements OnInit {
   constructor(
     private usuarioService: UsuarioService,
     private router: Router, // 👈 NUEVO: Inyectar Router
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService,
   ) {}
 
   ngOnInit() {
@@ -56,11 +58,24 @@ export class UsuarioComponent implements OnInit {
 
   // 
     verHistorial(usuario: any) {
-    if (usuario && usuario.id_usuario) {
-      console.log('👉 Navegando al historial del usuario ID:', usuario.id_usuario);
-      this.router.navigate(['/encuesta-usuario', usuario.id_usuario]);
-    } else {
-      console.error('❌ El usuario no tiene un id_usuario válido', usuario);
-    }
+  // 👇 Verificar si el usuario que hace clic es el dueño del historial
+  const usuarioLogueado = this.authService.getUsuarioActual();
+  
+  if (!usuarioLogueado) {
+    console.warn('⚠️ No hay usuario logueado');
+    return;
   }
+
+  const idSesion = String(usuarioLogueado.id_usuario || usuarioLogueado.id);
+  const idDelBoton = String(usuario.id_usuario);
+
+  if (idSesion !== idDelBoton) {
+    console.warn('⛔ No puedes ver el historial de otro usuario');
+    // Opcional: mostrar un SweetAlert o mensaje
+    return;
+  }
+
+  // ✅ Solo si coincide, navegar
+  this.router.navigate(['/encuesta-usuario', usuario.id_usuario]);
+}
 }

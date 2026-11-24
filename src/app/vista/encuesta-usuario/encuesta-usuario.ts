@@ -1,11 +1,12 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router'; // 👈 1. Importar Router
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatIconModule } from '@angular/material/icon'; // 👈 2. Importar MatIconModule
-import { MatButtonModule } from '@angular/material/button'; // 👈 3. Importar MatButtonModule
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { Tabla } from '../../component/tabla/tabla';
-import { EncuestaUsuarioService } from '../../servicios/encuesta-usuario';
+import { EncuestaUsuarioService, EncuestaUsuario } from '../../servicios/encuesta-usuario';
+import { AuthService } from '../../servicios/auth.service'; // 👈 NUEVO: Importar AuthService
 
 @Component({
   selector: 'app-encuesta-usuario',
@@ -13,16 +14,16 @@ import { EncuestaUsuarioService } from '../../servicios/encuesta-usuario';
   imports: [
     CommonModule,
     MatProgressSpinnerModule,
-    MatIconModule,      // 👈 4. Agregarlo a los imports
-    MatButtonModule,    // 👈 5. Agregarlo a los imports
+    MatIconModule,
+    MatButtonModule,
     Tabla
   ],
   templateUrl: './encuesta-usuario.html',
   styleUrl: './encuesta-usuario.css'
 })
 export class EncuestaUsuarioComponent implements OnInit {
-  
-  dataSource: any[] = [];
+
+  dataSource: EncuestaUsuario[] = [];
   isLoading = true;
   idUsuarioActual: string | number | null = null;
   nombreUsuario: string = '';
@@ -30,48 +31,62 @@ export class EncuestaUsuarioComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router, // 👈 6. Inyectar Router
+    private router: Router,
     private cdr: ChangeDetectorRef,
-    private encuestaUsuarioService: EncuestaUsuarioService
+    private encuestaUsuarioService: EncuestaUsuarioService,
+    private authService: AuthService // 👈 NUEVO: Inyectar AuthService
   ) {}
 
   ngOnInit() {
-  const idParam = this.route.snapshot.paramMap.get('id');
-  console.log('🔍 ID en la URL:', idParam);
+    // 👇 PASO 1: Obtener el usuario logueado DESDE el servicio (no desde localStorage directo)
+    const usuarioLogueado = this.authService.getUsuarioActual();
+    console.log('🔐 Usuario logueado:', usuarioLogueado);
 
-  if (idParam) {
-    // MODO ADMINISTRADOR: Hay un ID en la URL, muestra el historial de ese usuario
-    this.idUsuarioActual = idParam;
-    this.cargarRespuestas(this.idUsuarioActual);
-  } else {
-    // MODO USUARIO NORMAL: No hay ID en la URL, revisamos si está logueado
-    const usuarioGuardado = localStorage.getItem('usuario_actual');
-    
-    if (usuarioGuardado) {
-      const usuario = JSON.parse(usuarioGuardado);
-      this.idUsuarioActual = usuario.id_usuario || usuario.id;
-      this.nombreUsuario = usuario.nombre;
-      this.cargarRespuestas(this.idUsuarioActual!);
-    } else {
-      // MODO NO LOGUEADO: ¡Aquí está la restricción!
-      console.log('⚠️ Usuario no logueado, bloqueando acceso.');
+    // 👇 PASO 2: Si NO hay nadie logueado, bloquear TODO
+    if (!usuarioLogueado) {
       this.mensajeError = 'Debes iniciar sesión para ver el historial de encuestas.';
       this.isLoading = false;
       this.cdr.detectChanges();
+      return; // 👈 IMPORTANTE: Detener ejecución aquí
+    }
+
+    // 👇 PASO 3: Obtener el ID del usuario logueado
+    const idSesion = String(usuarioLogueado.id_usuario || usuarioLogueado.id);
+    console.log('🔑 ID de la sesión:', idSesion);
+
+    // 👇 PASO 4: Leer el ID de la URL (si existe)
+    const idParam = this.route.snapshot.paramMap.get('id');
+    console.log('🔍 ID en la URL:', idParam);
+
+    // 👇 PASO 5: Si hay ID en la URL, verificar que sea el MISMO usuario
+    if (idParam) {
+      if (String(idParam) !== idSesion) {
+        // ⛔ El ID de la URL NO coincide con el usuario logueado
+        this.mensajeError = 'No tienes permiso para ver el historial de otro usuario.';
+        this.isLoading = false;
+        this.cdr.detectChanges();
+        return; // 👈 Bloquear
+      }
+      // ✅ El ID coincide, mostrar el historial propio
+      this.idUsuarioActual = idSesion;
+      this.nombreUsuario = usuarioLogueado.nombre;
+      this.cargarRespuestas(this.idUsuarioActual);
+    } else {
+      // ✅ No hay ID en la URL, mostrar el historial propio
+      this.idUsuarioActual = idSesion;
+      this.nombreUsuario = usuarioLogueado.nombre;
+      this.cargarRespuestas(this.idUsuarioActual);
     }
   }
-}
 
-    cargarRespuestas(idUsuario: string | number) {
+  cargarRespuestas(idUsuario: string | number) {
     this.isLoading = true;
     this.mensajeError = '';
 
-    
     this.encuestaUsuarioService.getRespuestasPorUsuario(idUsuario).subscribe({
       next: (respuestasFiltradas) => {
-        this.dataSource = respuestasFiltradas; // Ya vienen filtradas del backend
-        
-        console.log(` Respuestas del usuario ${idUsuario} (traídas del backend):`, this.dataSource);
+        this.dataSource = respuestasFiltradas;
+        console.log(`✅ Respuestas del usuario ${idUsuario}:`, this.dataSource);
 
         setTimeout(() => {
           this.isLoading = false;
@@ -87,11 +102,9 @@ export class EncuestaUsuarioComponent implements OnInit {
         }, 0);
       }
     });
-   }
-  
-
-  
-  irAlLogin() {
-    this.router.navigate(['/']); // Ajusta '/' si tu ruta de login es diferente (ej: '/login')
   }
-};
+
+  irAlLogin() {
+    this.router.navigate(['/']);
+  }
+}
