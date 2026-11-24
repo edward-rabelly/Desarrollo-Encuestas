@@ -88,7 +88,6 @@ export class AvatarUsuarioComponent implements OnInit {
 
   cerrarSesion() {
     this.authService.cerrarSesion();
-    this.usuario = null;
     this.router.navigate(['/']);
   }
 }
