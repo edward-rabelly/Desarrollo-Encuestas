@@ -1,6 +1,6 @@
 // Importa el decorador necesario para definir un componente en Angular
-import { Component } from '@angular/core';
-
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from './servicios/auth.service';
 // Importa el componente que actuará como el Layout Maestro de toda la aplicación
 import { MenuComponent } from './component/menu/menu.component';
 import { RouterOutlet } from '@angular/router';
@@ -17,15 +17,29 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.html',// Vincula la plantilla HTML (que contiene <app-menu></app-menu>)
   styleUrl: './app.css' // Vincula los estilos globales de la aplicación
 })
-export class App {
-
-  /**
-   * Propiedad inmutable que define el nombre o título del proyecto.
-   * Se puede utilizar en la plantilla HTML mediante interpolación: {{ title }}
-   * (Este es el valor que el archivo app.spec.ts intenta verificar en sus pruebas).
-   */
+export class App implements OnInit {
+  
   protected readonly title = 'Edward_Proyecto';
-}
+  
+  // 👇 Estado global para saber si mostrar el botón de Login o el Avatar
+  usuarioLogueado = false;
 
-// se puede decir el app.ts es para tener lo basico y menucomponent para estructurar todo, porque asi? para evitar hacer todo desde cero
-//  si llegue hacer un cambio
+  constructor(private authService: AuthService) {}
+
+  ngOnInit() {
+    // 👇 Escuchar en tiempo real si el usuario inicia o cierra sesión
+    this.authService.usuarioActual$.subscribe(usuario => {
+      this.usuarioLogueado = !!usuario; // true si hay usuario, false si es null
+    });
+  }
+
+  // 👇 Método que recibe el evento del modal cuando el login es exitoso
+  onLoginExitoso(usuario: any) {
+    this.usuarioLogueado = true;
+  }
+
+  // 👇 Método que recibe el evento del avatar cuando se cierra sesión
+  onSesionCerrada() {
+    this.usuarioLogueado = false;
+  }
+}
