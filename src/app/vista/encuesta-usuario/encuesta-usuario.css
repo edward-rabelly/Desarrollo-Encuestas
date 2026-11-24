@@ -1,0 +1,40 @@
+.spinner-container, .mensaje-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+}
+
+.mensaje-error h3 {
+  color: #d32f2f;
+  margin-top: 1rem;
+}
+
+.mensaje-error p {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.encuestas-lista {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h2 {
+  color: #333;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #4dd0e1;
+  padding-bottom: 0.5rem;
+}
+
+.sin-datos {
+  text-align: center;
+  color: #666;
+  font-size: 1.1rem;
+  padding: 2rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+}

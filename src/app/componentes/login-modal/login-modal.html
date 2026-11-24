@@ -21,70 +21,125 @@
       </button>
     </div>
 
-    <!-- Formulario -->
-    <form (ngSubmit)="enviarFormulario()" #loginForm="ngForm">
+    <!-- Formulario nativo HTML con ngSubmit y formGroup -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
 
-      <!-- CAMPOS EXCLUSIVOS DE REGISTRO -->
+      <!-- CAMPOS EXCLUSIVOS DE REGISTRO 
+       es para valdiar cada parte junto con el ts, no tiene logica pero si es toda la parte de 
+       cuantos espacios debe tener cada cosa en el modo registro-->
       <ng-container *ngIf="modo === 'registro'">
+        
+        <!-- Nombre -->
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Nombre completo</mat-label>
-          <input matInput [(ngModel)]="usuario.nombre" name="nombre" required>
+          <input matInput formControlName="nombre">
+          <mat-error *ngIf="loginForm.get('nombre')?.hasError('required')">
+            Agregar nombre
+          </mat-error>
+          <mat-error *ngIf="loginForm.get('nombre')?.hasError('minlength')">
+            Mínimo 3 caracteres
+          </mat-error>
         </mat-form-field>
 
         <div class="form-row">
+          <!-- Tipo de Documento -->
           <mat-form-field appearance="outline" class="half-width">
             <mat-label>Tipo Doc.</mat-label>
-            <mat-select [(ngModel)]="usuario.tipo_documento" name="tipo_documento" required>
+            <mat-select formControlName="tipo_documento">
               <mat-option value="CC">CC</mat-option>
               <mat-option value="TI">TI</mat-option>
               <mat-option value="CE">CE</mat-option>
             </mat-select>
+            <mat-error *ngIf="loginForm.get('tipo_documento')?.hasError('required')">
+              Agregar tipo de documento
+            </mat-error>
           </mat-form-field>
 
+          <!-- Número de Documento -->
           <mat-form-field appearance="outline" class="half-width">
             <mat-label>Número</mat-label>
-            <input matInput type="text" [(ngModel)]="usuario.numero_documento" name="numero_documento" required>
+            <input matInput type="text" formControlName="numero_documento">
+            <mat-error *ngIf="loginForm.get('numero_documento')?.hasError('required')">
+              Agregar número
+            </mat-error>
+            <mat-error *ngIf="loginForm.get('numero_documento')?.hasError('pattern')">
+              Solo se permiten números
+            </mat-error>
           </mat-form-field>
         </div>
 
         <div class="form-row">
+          <!-- Edad -->
           <mat-form-field appearance="outline" class="half-width">
             <mat-label>Edad</mat-label>
-            <input matInput type="number" [(ngModel)]="usuario.edad" name="edad" required min="1">
+            <input matInput type="number" formControlName="edad">
+            <mat-error *ngIf="loginForm.get('edad')?.hasError('required')">
+              Agregar edad
+            </mat-error>
+            <mat-error *ngIf="loginForm.get('edad')?.hasError('min') || loginForm.get('edad')?.hasError('max')">
+              Edad entre 1 y 120
+            </mat-error>
           </mat-form-field>
 
+          <!-- Género -->
           <mat-form-field appearance="outline" class="half-width">
             <mat-label>Género</mat-label>
-            <mat-select [(ngModel)]="usuario.genero" name="genero" required>
+            <mat-select formControlName="genero">
               <mat-option value="Masculino">Masculino</mat-option>
               <mat-option value="Femenino">Femenino</mat-option>
               <mat-option value="Otro">Otro</mat-option>
             </mat-select>
+            <mat-error *ngIf="loginForm.get('genero')?.hasError('required')">
+              Agregar género
+            </mat-error>
           </mat-form-field>
         </div>
       </ng-container>
 
       <!-- CAMPOS COMUNES (Login y Registro) -->
+      
+      <!-- Email -->
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Correo electrónico</mat-label>
-        <input matInput type="email" [(ngModel)]="usuario.email" name="email" required email>
+        <input matInput type="email" formControlName="email">
+        <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+          Agregar usuario
+        </mat-error>
+        <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+          Agregar email
+        </mat-error>
       </mat-form-field>
 
+      <!-- Contraseña con botón mostrar/ocultar -->
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Contraseña</mat-label>
-        <input matInput type="password" [(ngModel)]="usuario.contrasena" name="contrasena" required>
+        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="contrasena">
+        
+        <!-- Botón tipo "ojo" al final del input, en este punto dice que si preciono muestra la contraseña o si no-->
+        <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()" tabindex="-1">
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button> 
+        
+        <!-- Mensaje de error, el primero dice que no peude estar vacia-->
+        <mat-error *ngIf="loginForm.get('contrasena')?.hasError('required')">
+          La contraseña es obligatoria
+        </mat-error>
+
+        <!-- Mensaje de error, el segundo dice que no tiene los caracteres suficientes-->
+        <mat-error *ngIf="loginForm.get('contrasena')?.hasError('minlength')">
+          Mínimo 6 caracteres
+        </mat-error>
       </mat-form-field>
 
-      <!-- Mensaje de Error -->
-      <p *ngIf="mensaje" class="error-message" [ngClass]="{'text-error': esError, 'text-success': !esError}">
-        {{ mensaje }}
-      </p>
-
       <!-- Botón de Enviar -->
-      <button mat-raised-button color="primary" type="submit" class="full-width submit-btn" [disabled]="loginForm.invalid">
-        {{ modo === 'login' ? 'Ingresar' : 'Crear Cuenta' }}
+      <button mat-raised-button color="primary" type="submit" class="full-width submit-btn">
+        {{ modo === 'login' ? 'Iniciar sesión' : 'Crear Cuenta' }}
       </button>
 
     </form>
   </div>
 </div>
+
+<!-- forn es de nativo html, ngsubmit escuha al boton on sunbimt funcion de ts forgroup , forcontrollame mat-error
+ ese botn para ver la contraseña es eñ botoon aqui y la logica en ts, los validadores van dentro de contructor
+ sweettaler2 onsubit-->

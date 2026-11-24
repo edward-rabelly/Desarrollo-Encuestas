@@ -8,7 +8,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { Tabla } from '../../component/tabla/tabla';
 
 import { Preguntas, Pregunta } from '../../servicios/preguntas';
-// ✅ Importamos la interfaz (datos) y el servicio (clase con "Service")
+//  Importamos la interfaz (datos) y el servicio (clase con "Service")
 import { EncuestaUsuario, EncuestaUsuarioService } from '../../servicios/encuesta-usuario';
 
 interface PreguntaConRespuesta extends Pregunta {
@@ -33,25 +33,35 @@ export class PreguntasComponent implements OnInit {
   
   // --- MODO 1: Ver todas las preguntas (Tabla dinámica) ---
   dataSource: Pregunta[] = [];
+
+  //spiner
   isLoading = true;
 
-  // --- MODO 2: Responder una encuesta (Formulario) ---
+  // --- MODO 2: Responder una encuesta (Formulario), es la parte del inicio
   modoRespuesta = false;
+  //esto no dcie que  oculta el id si no que nadie a escogido esa pregunta con ese id
   idEncuestaActual: number | null = null;
+  // las preguntas tienen una data traiga esa data
   preguntasRespuesta: PreguntaConRespuesta[] = [];
+  //nadiea  oprimido ese boton por eso esta en false
   isLoadingPreguntas = false;
+  // nadie a respondido ninguna encuesta por eso false
   enviandoRespuestas = false;
 
   constructor(
     private preguntasService: Preguntas,
     private encuestaUsuarioService: EncuestaUsuarioService,
-    private route: ActivatedRoute,
+    private route: ActivatedRoute, // solo lee la url y en este caso es de las preguntas
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
     // Leemos si viene un ID en la URL (ej: /preguntas/1)
+    // el this.route activa activateroute
+    //snapshot es para una intantania de la url 
+    // paramap busca el parametro que tiene esa url 
+    // y get que dentro de esa url hay algo exacto que es la /1
     const id = this.route.snapshot.paramMap.get('id');
     
     if (id) {
@@ -93,41 +103,57 @@ export class PreguntasComponent implements OnInit {
       }
     });
   }
+ 
+
 
   enviarRespuestas() {
+    //aqui iniciamos con el hecho de que si esta logueado o no 
     const usuarioGuardado = localStorage.getItem('usuario_actual');
     if (!usuarioGuardado) {
       alert('Debes iniciar sesión para responder una encuesta.');
       this.router.navigate(['/']); 
       return;
     }
-
+    
+    //esta linea dice que 
     const usuario = JSON.parse(usuarioGuardado);
+
+   // esat desglosa el mensaje
     const idUsuarioDinamico = usuario.id_usuario;
-
+   
+    //aqui decimos que esa data lo envie con las respeustas
     this.enviandoRespuestas = true;
-
-    // ✅ Usamos '!' para asegurar a TypeScript que no son null en este punto
+    
+   // es una estrucura de datos dinamicos, osea envie la repuesta a encuestausuario pero que lo desglose de esa manera
     const respuestas: EncuestaUsuario[] = this.preguntasRespuesta.map(p => ({
       id_usuario: idUsuarioDinamico,
       id_encuesta: this.idEncuestaActual!,   
       id_pregunta: p.id_pregunta!,           
       respuesta: p.respuesta
     }));
-
+    
+    //esto es para enviar varias respuestas al mismo tiempo, el topromise es un traductor, nativa de java script, 
+    //envia todo el paquete separado
     const promesas = respuestas.map(r => this.encuestaUsuarioService.crearRespuesta(r).toPromise());
 
-    Promise.all(promesas).then(() => {
-      alert('✅ Encuesta enviada correctamente');
+    
+    //aqui e sapra confirmar que los paquetes se hayan enviado
+    Promise.all(promesas). 
+
+     //si todo sale bien que se envien
+       then(() => {
+      alert(' Encuesta enviada correctamente');
       this.router.navigate(['/encuesta']); // Volvemos a la lista de encuestas
     }).catch(error => {
       console.error('Error al enviar:', error);
-      alert('❌ Error al enviar la encuesta');
+      alert(' Error al enviar la encuesta');
       this.enviandoRespuestas = false;
       this.cdr.detectChanges();
     });
   }
+  
 
+  // me envia a la ruta de encuestas
   cancelarRespuesta() {
     this.router.navigate(['/encuesta']);
   }

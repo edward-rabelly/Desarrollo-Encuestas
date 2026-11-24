@@ -1,21 +1,20 @@
-<!-- 
-  1. ESTADO DE CARGA INICIAL
-  - Se muestra SOLO mientras isLoading es true (al entrar a la página).
-  - Evita que el usuario vea una tabla vacía o rota mientras llegan los datos del backend.
-  🔗 CONEXIÓN TS: this.isLoading = true/false en cargarEncuestas()
--->
-<div *ngIf="isLoading" >
-  <mat-spinner></mat-spinner>
+
+<div *ngIf="isLoading" class="loading-container"> <!-- es como una estructura fija,como un inteructor -->
+  <mat-spinner></mat-spinner> 
   <p>Cargando encuestas...</p>
 </div>
-<div *ngIf="!isLoading" class="encuestas-lista">
-  <div *ngFor="let encuesta of dataSource" class="encuesta-item">
-    <h3>{{ encuesta.descripcion }}</h3>
-    <p><strong>Código:</strong> {{ encuesta.codigo }}</p>
-    <button mat-raised-button  (click)="realizarEncuesta(encuesta)">
-       Realizar Encuesta
-    </button>
-  </div>
-</div>
-<app-tabla [data]="dataSource"></app-tabla>
 
+
+<div *ngIf="!isLoading" class="encuestas-lista">
+  <app-tabla 
+    [data]="dataSource" 
+    [mostrarBoton]="true" 
+    [textoBoton]="'Realizar Encuesta'" 
+    [tituloColumnaAccion]="'Encuestas disponibles'"
+    (filaSeleccionada)="realizarEncuesta($event)">
+  </app-tabla>
+</div>
+
+ <!-- div es la estructura que va a tener lo que ponga adentro           -->
+   <!-- la p es una etiqueta de html para un parrafo     -->
+     <!--la parte de strong es para enfatizar que es algo fuerte yvuelve el  mensaje en  negrilla   -->

@@ -1,8 +1,34 @@
-<!-- Loading Spinner -->
-<div *ngIf="isLoading" >
-  <mat-spinner ></mat-spinner>
-  <p>Cargando encuesta-usario.</p>
+<!-- ESTADO 1: Cargando -->
+<div *ngIf="isLoading" class="spinner-container">
+  <mat-spinner></mat-spinner>
+  <p>Cargando respuestas...</p>
 </div>
 
-<!-- Tabla Genérica Reutilizable -->
-<app-tabla [data]="dataSource"></app-tabla>
+<!-- ESTADO 2: Error o No Logueado -->
+<div *ngIf="!isLoading && mensajeError" class="mensaje-error">
+  <mat-icon color="warn" style="font-size: 48px; width: 48px; height: 48px;">lock_open</mat-icon>
+  <h3>Acceso Restringido</h3>
+  <p>{{ mensajeError }}</p>
+  <button mat-raised-button color="primary" (click)="irAlLogin()">
+    Ir a Iniciar Sesión
+  </button>
+</div>
+
+<!-- ESTADO 3: Éxito (Mostrar Tabla) -->
+<div *ngIf="!isLoading && !mensajeError" class="encuestas-lista">
+  <h2>
+    Historial de Respuestas 
+    <span *ngIf="nombreUsuario">de: {{ nombreUsuario }}</span>
+    <span *ngIf="!nombreUsuario">#{{ idUsuarioActual }}</span>
+  </h2>
+  
+  <p *ngIf="dataSource.length === 0" class="sin-datos">
+    Este usuario aún no ha respondido ninguna encuesta.
+  </p>
+
+  <app-tabla 
+    *ngIf="dataSource.length > 0"
+    [data]="dataSource" 
+    [mostrarBoton]="false">
+  </app-tabla>
+</div>

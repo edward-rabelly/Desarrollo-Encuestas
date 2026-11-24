@@ -61,21 +61,6 @@
   flex: 1;
 }
 
-/* Mensajes */
-.error-message {
-  text-align: center;
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-}
-
-.text-error {
-  color: #f44336;
-}
-
-.text-success {
-  color: #4caf50;
-}
-
 /* Botón de envío */
 .submit-btn {
   margin-top: 1rem;

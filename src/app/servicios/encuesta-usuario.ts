@@ -15,8 +15,9 @@ export interface EncuestaUsuario {
   providedIn: 'root',
 })
 export class EncuestaUsuarioService {
-  // ⚠️ Asegúrate de que esta URL sea la correcta de tu backend
-  private apiUrl = 'https://api-encuestas-2vld.onrender.com/api/respuestas';
+  //  Asegúrate de que esta URL sea la correcta de tu backend
+  //private apiUrl = 'https://api-encuestas-2vld.onrender.com/api/respuestas';
+  private apiUrl = 'http://localhost:3000/api/respuestas'; 
 
   constructor(private http: HttpClient) {}
 
@@ -31,8 +32,8 @@ export class EncuestaUsuarioService {
   }
 
   // Coincide con: router.get('/usuario/:idUsuario/encuesta/:idEncuesta', obtenerRespuestasPorUsuarioYEncuesta);
-  getRespuestasPorUsuarioYEncuesta(idUsuario: number, idEncuesta: number): Observable<EncuestaUsuario[]> {
-    return this.http.get<EncuestaUsuario[]>(`${this.apiUrl}/usuario/${idUsuario}/encuesta/${idEncuesta}`);
+  getRespuestasPorUsuario(idUsuario: string | number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/usuario/${idUsuario}`);
   }
 
   // Coincide con: router.post('/', crearRespuesta);

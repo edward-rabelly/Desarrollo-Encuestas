@@ -14,13 +14,13 @@
       <a mat-list-item routerLink="/Usuario">Usuario</a>
       <a mat-list-item routerLink="/encuesta">Encuesta</a>
       <a mat-list-item routerLink="/preguntas">Preguntas</a>              
-  <a mat-list-item routerLink="/encuesta-usuario">Encuesta-Usuario</a>
+      <a mat-list-item routerLink="/encuesta-usuario">Encuesta-Usuario</a>
     </mat-nav-list>
   </mat-sidenav>
 
   <!-- CONTENIDO PRINCIPAL -->
   <mat-sidenav-content>
-    <mat-toolbar style="background-color: rgb(64, 218, 238);">
+    <mat-toolbar class="toolbar-principal">
       
       @if (isHandset$ | async) {
         <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
@@ -33,9 +33,10 @@
 
       <button 
         *ngIf="!usuarioLogueado" 
-        mat-raised-button 
-        style="background-color: white; color: rgb(64, 218, 238); font-weight: bold; margin-right: 10px;"
+        mat-stroked-button 
+        class="btn-login"
         (click)="abrirLogin()">
+        <mat-icon>login</mat-icon>
         Iniciar Sesión
       </button>
 
@@ -47,7 +48,7 @@
     </mat-toolbar>
 
     <!-- AQUÍ SE INYECTAN LAS VISTAS (Inicio, Usuario o Encuesta) -->
-    <div style="padding: 20px;">
+    <div class="contenido-principal">
       <router-outlet></router-outlet>
     </div>
 

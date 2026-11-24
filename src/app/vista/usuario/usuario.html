@@ -3,20 +3,12 @@
   <p>Cargando usuarios...</p>
 </div>
 
-<app-tabla *ngIf="!isLoading" [data]="dataSource" [mostrarBoton]="true" (filaSeleccionada)="verHistorial($event)"></app-tabla>
- 
-<div *ngIf="usuarioSeleccionado"> <!-- 1. CONTROL DE VISIBILIDAD -->
-  <h3>Historial de: {{ usuarioSeleccionado.nombre }}</h3> <!-- 2. TÍTULO DINÁMICO -->
-  <button (click)="cerrarHistorial()">Cerrar</button> <!-- 3. BOTÓN DE ACCIÓN -->
-
-  <div *ngIf="isLoadingHistorial"> <!-- 4. ESTADO DE CARGA (Spinner) -->
-    <mat-spinner></mat-spinner>
-    <p>Cargando respuestas...</p>
-  </div>
-
-  <app-tabla *ngIf="!isLoadingHistorial" [data]="historialData"></app-tabla> <!-- 5. LA TABLA EN SÍ -->
-
-  <p *ngIf="!isLoadingHistorial && historialData.length === 0"> <!-- 6. ESTADO VACÍO -->
-    Este usuario aún no ha respondido ninguna encuesta.
-  </p>
-</div>
+<!-- Tabla principal de usuarios -->
+<app-tabla 
+  *ngIf="!isLoading" 
+  [data]="dataSource" 
+  [mostrarBoton]="true" 
+  [textoBoton]="'Ver Historial'" 
+  [tituloColumnaAccion]="'Acción'"
+  (filaSeleccionada)="verHistorial($event)">
+</app-tabla>

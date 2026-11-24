@@ -14,6 +14,8 @@ export class Tabla implements OnChanges {
   @Input() data: any[] = [];
   @Input() mostrarBoton = false;
   displayColumns: string[] = [];
+  @Input() textoBoton: string = '';
+  @Input() tituloColumnaAccion: string = 'Accion';
 
   @Output() filaSeleccionada = new EventEmitter<any>();
 

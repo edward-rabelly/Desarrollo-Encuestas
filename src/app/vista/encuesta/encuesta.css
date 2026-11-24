@@ -1,0 +1,64 @@
+.encuestas-lista {
+  padding: 1rem 2rem;
+  
+}
+
+
+.encuestas-lista ::ng-deep table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.encuestas-lista ::ng-deep thead {
+  background: #4dd0e1;
+  color: white;
+}
+
+.encuestas-lista ::ng-deep th,
+.encuestas-lista ::ng-deep td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.encuestas-lista ::ng-deep th {
+  font-weight: 600;
+}
+
+.encuestas-lista ::ng-deep tr:hover {
+  background: #f5f5f5;
+}
+
+.encuestas-lista ::ng-deep button {
+  background-color: #4dd0e1 !important;
+  color: rgb(5, 5, 5) !important;
+  padding: 6px 16px !important;
+  border-radius: 4px !important;
+  border: none !important;
+  cursor: pointer !important;
+  font-weight: 500 !important;
+  white-space: nowrap;
+}
+
+.encuestas-lista ::ng-deep button:hover {
+  background-color: #26c6da !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centrado vertical */
+  align-items: center; /* Centrado horizontal */
+  transform: translateY(50px); /* Espacio entre spinner y texto */
+}
+
+.loading-container p {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+}

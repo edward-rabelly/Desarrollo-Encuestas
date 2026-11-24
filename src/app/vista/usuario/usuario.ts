@@ -1,10 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router'; // 👈 NUEVO: Importar Router
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Tabla } from '../../component/tabla/tabla';
 import { UsuarioService } from '../../servicios/usuario.service';
-
-import { EncuestaUsuario, EncuestaUsuarioService } from '../../servicios/encuesta-usuario';
 
 @Component({
   selector: 'app-usuario',
@@ -22,14 +21,9 @@ export class UsuarioComponent implements OnInit {
   dataSource: any[] = [];
   isLoading = true;
 
-  usuarioSeleccionado: any = null;
-  historialData: EncuestaUsuario[] = [];
-  isLoadingHistorial = false;
-
   constructor(
     private usuarioService: UsuarioService,
-    // ✅ Usa el nombre correcto del servicio (con "Service")
-    private encuestaUsuarioService: EncuestaUsuarioService,
+    private router: Router, // 👈 NUEVO: Inyectar Router
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -60,36 +54,13 @@ export class UsuarioComponent implements OnInit {
     });
   }
 
-  verHistorial(usuario: any) {
-    this.usuarioSeleccionado = usuario;
-    this.isLoadingHistorial = true;
-    this.historialData = [];
-
-    this.encuestaUsuarioService.getRespuestas().subscribe({
-      next: (todasLasRespuestas: EncuestaUsuario[]) => {
-        this.historialData = todasLasRespuestas.filter(
-          (respuesta: EncuestaUsuario) => respuesta.id_usuario == usuario.id_usuario
-        );
-        
-        console.log(`✅ Historial de ${usuario.nombre}:`, this.historialData);
-        
-        setTimeout(() => {
-          this.isLoadingHistorial = false;
-          this.cdr.detectChanges();
-        }, 0);
-      },
-      error: (error: any) => {
-        console.error('❌ Error al cargar historial:', error);
-        setTimeout(() => {
-          this.isLoadingHistorial = false;
-          this.cdr.detectChanges();
-        }, 0);
-      }
-    });
-  }
-
-  cerrarHistorial() {
-    this.usuarioSeleccionado = null;
-    this.historialData = [];
+  // 
+    verHistorial(usuario: any) {
+    if (usuario && usuario.id_usuario) {
+      console.log('👉 Navegando al historial del usuario ID:', usuario.id_usuario);
+      this.router.navigate(['/encuesta-usuario', usuario.id_usuario]);
+    } else {
+      console.error('❌ El usuario no tiene un id_usuario válido', usuario);
+    }
   }
 }
