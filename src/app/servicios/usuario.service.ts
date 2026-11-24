@@ -18,8 +18,8 @@ export interface Usuario {
   providedIn: 'root',
 })
 export class UsuarioService {
-  getUsuarios() {
-    throw new Error('Method not implemented.');
+  getUsuarios(): Observable<Usuario[]> {
+    return this.http.get<Usuario[]>(this.apiUrl);
   }
   // 2. URL de TU backend local (asegúrate de que el backend esté corriendo con 'npm run dev')
   private apiUrl = 'https://api-encuestas-2vld.onrender.com/api/usuarios';

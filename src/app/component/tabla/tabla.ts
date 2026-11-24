@@ -6,39 +6,33 @@ import { MatButtonModule } from '@angular/material/button';
 @Component({
   selector: 'app-tabla',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatTableModule,
-    MatButtonModule
-  ],
+  imports: [CommonModule, MatTableModule, MatButtonModule],
   templateUrl: './tabla.html',
   styleUrl: './tabla.css'
 })
 export class Tabla implements OnChanges {
-  
+
   @Input() data: any[] = [];
-  @Input() columnas: string[] = []; // 👈 El padre SIEMPRE debe pasar las columnas
   @Input() mostrarBoton = false;
   @Input() textoBoton = 'Ver';
   @Input() tituloColumnaAccion = 'Acción';
-  
-  @Output() verHistorial = new EventEmitter<any>();
+
+  @Output() filaSeleccionada = new EventEmitter<any>();
 
   displayColumns: string[] = [];
 
   ngOnChanges(changes: SimpleChanges) {
-    this.actualizarColumnas();
-  }
-
-  private actualizarColumnas() {
-    // 👇 Si el padre no pasa columnas, mostrar array vacío (tabla vacía)
-    // Nunca hardcodeamos columnas específicas
-    this.displayColumns = this.mostrarBoton 
-      ? [...this.columnas, 'accion'] 
-      : [...this.columnas];
+    if (changes['data'] && this.data.length > 0) {
+      // 👇 Detecta automáticamente las columnas del primer objeto
+      this.displayColumns = Object.keys(this.data[0]);
+      
+      if (this.mostrarBoton) {
+        this.displayColumns.push('accion');
+      }
+    }
   }
 
   onRowClick(element: any) {
-    this.verHistorial.emit(element);
+    this.filaSeleccionada.emit(element);
   }
 }

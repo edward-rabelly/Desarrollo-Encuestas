@@ -1,33 +1,17 @@
-<!-- Estado de carga -->
 <div *ngIf="isLoading" class="spinner-container">
   <mat-spinner></mat-spinner>
   <p>Cargando usuarios...</p>
 </div>
 
-<!-- Tabla de usuarios -->
 <div *ngIf="!isLoading" class="usuarios-lista">
-  <h2>
-    Lista de Usuarios
-    <span *ngIf="usuarioLogueado" class="badge-logged">🔓 Modo completo</span>
-    <span *ngIf="!usuarioLogueado" class="badge-public">🔒 Modo público</span>
-  </h2>
+  <h2>Lista de Usuarios</h2>
 
-  <!-- Mensaje si no hay usuarios -->
-  <p *ngIf="dataSource.length === 0" class="sin-datos">
-    No hay usuarios registrados.
-  </p>
-
-  <!-- 👇 TABLA CON COLUMNAS DINÁMICAS -->
-  <app-tabla 
+  <app-tabla
     *ngIf="dataSource.length > 0"
     [data]="dataSource"
-    [columnas]="columnasVisibles"
-    [mostrarBoton]="usuarioLogueado"
-    (verHistorial)="verHistorial($event)">
+    [mostrarBoton]="true"
+    textoBoton="Ver Historial"
+    tituloColumnaAccion="Acción"
+    (filaSeleccionada)="verHistorial($event)">
   </app-tabla>
-
-  <!-- Nota para usuarios no logueados -->
-  <p *ngIf="!usuarioLogueado" class="nota-publica">
-    ℹ️ Inicia sesión para ver la información completa de los usuarios.
-  </p>
 </div>
