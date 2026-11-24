@@ -36,29 +36,44 @@ export class EncuestaUsuarioComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const idParam = this.route.snapshot.paramMap.get('id');
+  const idParam = this.route.snapshot.paramMap.get('id');
+  console.log('🔍 ID en la URL:', idParam);
 
-    if (idParam) {
-      this.idUsuarioActual = idParam;
-      this.cargarRespuestas(this.idUsuarioActual);
-    } else {
-      const usuarioGuardado = localStorage.getItem('usuario_actual');
+  if (idParam) {
+    this.idUsuarioActual = idParam;
+    this.cargarRespuestas(this.idUsuarioActual);
+  } else {
+    const usuarioGuardado = localStorage.getItem('usuario_actual');
+    console.log('📦 String crudo de localStorage:', usuarioGuardado);
+    
+    if (usuarioGuardado) {
+      const usuario = JSON.parse(usuarioGuardado);
+      console.log('👤 Objeto usuario parseado COMPLETO:', usuario);
+      console.log('🔑 Todas las claves del objeto:', Object.keys(usuario));
       
-      if (usuarioGuardado) {
-        const usuario = JSON.parse(usuarioGuardado);
-        this.idUsuarioActual = usuario.id_usuario;
-        this.nombreUsuario = usuario.nombre;
-        
-        // 👇 7. AQUÍ ESTÁ LA SOLUCIÓN DEL ERROR TS2345: Agregamos el signo de exclamación (!)
-        this.cargarRespuestas(this.idUsuarioActual!); 
-        
+      // 👇 PRUEBA: Intentamos buscar el ID en cualquiera de estos nombres comunes
+      this.idUsuarioActual = usuario.id_usuario || usuario.id || usuario.idUsuario || usuario._id;
+      this.nombreUsuario = usuario.nombre || usuario.name || 'Usuario';
+      
+      console.log('✅ ID detectado para usar:', this.idUsuarioActual);
+      console.log('✅ Nombre detectado:', this.nombreUsuario);
+
+      if (this.idUsuarioActual) {
+        this.cargarRespuestas(this.idUsuarioActual);
       } else {
-        this.mensajeError = 'Debes iniciar sesión para ver el historial de encuestas.';
+        console.error('❌ No se pudo encontrar el ID del usuario en el objeto:', usuario);
+        this.mensajeError = 'Error: No se pudo identificar al usuario logueado.';
         this.isLoading = false;
         this.cdr.detectChanges();
       }
+    } else {
+      console.log('⚠️ No hay usuario logueado en localStorage');
+      this.mensajeError = 'Debes iniciar sesión para ver el historial de encuestas.';
+      this.isLoading = false;
+      this.cdr.detectChanges();
     }
   }
+}
 
     cargarRespuestas(idUsuario: string | number) {
     this.isLoading = true;
