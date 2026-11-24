@@ -28,9 +28,6 @@ export const routes: Routes = [
     { path: 'Usuario',     component: UsuarioComponent },
     // Ruta para el módulo de Encuestas. Se activa al navegar a /encuesta
     { path: 'encuesta',    component: EncuestaComponent },
-    { path: 'preguntas', component: PreguntasComponent },
-    
-    { path: 'encuesta-usuario', component: EncuestaUsuarioComponent },
     { path: 'preguntas/:id', component: PreguntasComponent, data: { renderMode: RenderMode.Client }},
     { path: 'encuesta-usuario/:id', component: EncuestaUsuarioComponent,  data: { renderMode: RenderMode.Client }  }
 ];
