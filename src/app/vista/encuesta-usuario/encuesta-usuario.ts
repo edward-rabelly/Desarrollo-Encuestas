@@ -40,34 +40,21 @@ export class EncuestaUsuarioComponent implements OnInit {
   console.log('🔍 ID en la URL:', idParam);
 
   if (idParam) {
+    // MODO ADMINISTRADOR: Hay un ID en la URL, muestra el historial de ese usuario
     this.idUsuarioActual = idParam;
     this.cargarRespuestas(this.idUsuarioActual);
   } else {
+    // MODO USUARIO NORMAL: No hay ID en la URL, revisamos si está logueado
     const usuarioGuardado = localStorage.getItem('usuario_actual');
-    console.log('📦 String crudo de localStorage:', usuarioGuardado);
     
     if (usuarioGuardado) {
       const usuario = JSON.parse(usuarioGuardado);
-      console.log('👤 Objeto usuario parseado COMPLETO:', usuario);
-      console.log('🔑 Todas las claves del objeto:', Object.keys(usuario));
-      
-      // 👇 PRUEBA: Intentamos buscar el ID en cualquiera de estos nombres comunes
-      this.idUsuarioActual = usuario.id_usuario || usuario.id || usuario.idUsuario || usuario._id;
-      this.nombreUsuario = usuario.nombre || usuario.name || 'Usuario';
-      
-      console.log('✅ ID detectado para usar:', this.idUsuarioActual);
-      console.log('✅ Nombre detectado:', this.nombreUsuario);
-
-      if (this.idUsuarioActual) {
-        this.cargarRespuestas(this.idUsuarioActual);
-      } else {
-        console.error('❌ No se pudo encontrar el ID del usuario en el objeto:', usuario);
-        this.mensajeError = 'Error: No se pudo identificar al usuario logueado.';
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      }
+      this.idUsuarioActual = usuario.id_usuario || usuario.id;
+      this.nombreUsuario = usuario.nombre;
+      this.cargarRespuestas(this.idUsuarioActual!);
     } else {
-      console.log('⚠️ No hay usuario logueado en localStorage');
+      // MODO NO LOGUEADO: ¡Aquí está la restricción!
+      console.log('⚠️ Usuario no logueado, bloqueando acceso.');
       this.mensajeError = 'Debes iniciar sesión para ver el historial de encuestas.';
       this.isLoading = false;
       this.cdr.detectChanges();
