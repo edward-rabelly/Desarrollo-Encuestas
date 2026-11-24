@@ -1,46 +1,44 @@
-import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-tabla',
   standalone: true,
-  imports: [CommonModule, MatTableModule],
+  imports: [
+    CommonModule,
+    MatTableModule,
+    MatButtonModule
+  ],
   templateUrl: './tabla.html',
   styleUrl: './tabla.css'
 })
 export class Tabla implements OnChanges {
-
+  
   @Input() data: any[] = [];
+  @Input() columnas: string[] = []; // 👈 El padre SIEMPRE debe pasar las columnas
   @Input() mostrarBoton = false;
+  @Input() textoBoton = 'Ver';
+  @Input() tituloColumnaAccion = 'Acción';
+  
+  @Output() verHistorial = new EventEmitter<any>();
+
   displayColumns: string[] = [];
-  @Input() textoBoton: string = '';
-  @Input() tituloColumnaAccion: string = 'Accion';
 
-  @Output() filaSeleccionada = new EventEmitter<any>();
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] && this.data && this.data.length > 0) {
-      this.generarColumnas();
-    }
+  ngOnChanges(changes: SimpleChanges) {
+    this.actualizarColumnas();
   }
 
-  private generarColumnas(): void {
-    this.displayColumns = [];
-    this.data.forEach((element) => {
-      Object.keys(element).forEach((key) => {
-        if (!this.displayColumns.includes(key)) {
-          this.displayColumns.push(key);
-        }
-      });
-    });
-
-    if (this.mostrarBoton) {
-      this.displayColumns.push('accion');
-    }
+  private actualizarColumnas() {
+    // 👇 Si el padre no pasa columnas, mostrar array vacío (tabla vacía)
+    // Nunca hardcodeamos columnas específicas
+    this.displayColumns = this.mostrarBoton 
+      ? [...this.columnas, 'accion'] 
+      : [...this.columnas];
   }
 
-  onRowClick(element: any): void {
-    this.filaSeleccionada.emit(element);
+  onRowClick(element: any) {
+    this.verHistorial.emit(element);
   }
 }

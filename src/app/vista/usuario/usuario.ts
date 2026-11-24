@@ -21,6 +21,21 @@ export class UsuarioComponent implements OnInit {
   
   dataSource: any[] = [];
   isLoading = true;
+  usuarioLogueado = false;
+
+  
+  columnasBasicas = ['nombre', 'edad'];
+  columnasCompletas = [
+    'id_usuario', 
+    'nombre', 
+    'tipo_documento', 
+    'numero_documento', 
+    'email', 
+    'edad', 
+    'genero'
+  ];
+
+  columnasVisibles: string[] = [];
 
   constructor(
     private usuarioService: UsuarioService,
