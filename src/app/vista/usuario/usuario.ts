@@ -39,7 +39,7 @@ export class UsuarioComponent implements OnInit {
 
   constructor(
     private usuarioService: UsuarioService,
-    private router: Router, // 👈 NUEVO: Inyectar Router
+    private router: Router, 
     private cdr: ChangeDetectorRef,
     private authService: AuthService,
   ) {}
