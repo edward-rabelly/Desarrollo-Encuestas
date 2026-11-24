@@ -31,7 +31,7 @@ export const routes: Routes = [
     { path: 'preguntas', component: PreguntasComponent },
     { path: 'encuesta-usuario', component: EncuestaUsuarioComponent },
     { path: 'preguntas/:id', component: PreguntasComponent, data: { renderMode: RenderMode.Client }},
-    { path: 'encuesta-usuario/:id', component: EncuestaUsuarioComponent }
+    { path: 'encuesta-usuario/:id', component: EncuestaUsuarioComponent,  data: { renderMode: RenderMode.Client }  }
 ];
 
 //es la pantalla vista del inicio de la aplicacion
